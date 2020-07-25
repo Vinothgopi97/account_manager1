@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "222481618090",
+    "firebase_url": "https://accountmanager-eb5c4.firebaseio.com",
+    "project_id": "accountmanager-eb5c4",
+    "storage_bucket": "accountmanager-eb5c4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222481618090:android:d1783ee480a37a32086cd3",
+        "android_client_info": {
+          "package_name": "vinothgopi.com.account_manager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "222481618090-pqeo0prsui5tru4fcjb428lvf6nt2c5b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx4AYfd--J6hIT5Nw88GNCM-VL_WN1yys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "222481618090-pqeo0prsui5tru4fcjb428lvf6nt2c5b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
