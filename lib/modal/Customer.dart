@@ -3,10 +3,31 @@ import 'package:firebase_database/firebase_database.dart';
 class Customer{
 
   String _id;
+  String _customerId;
   String _name;
-  DateTime _customerRegisterdOn;
   String _mobileNumber;
   String _address;
+  String _customerRegisterdOn;
+  String _customerRegisteredBy;
+
+
+  String get customerId => _customerId;
+
+  set customerId(String value) {
+    _customerId = value;
+  }
+
+  String get customerRegisteredBy => _customerRegisteredBy;
+
+  set customerRegisteredBy(String value) {
+    _customerRegisteredBy = value;
+  }
+
+  String get customerRegisterdOn => _customerRegisterdOn;
+
+  set customerRegisterdOn(String value) {
+    _customerRegisterdOn = value;
+  }
 
   String get id => _id;
 
@@ -14,8 +35,8 @@ class Customer{
     _id = value;
   }
 
-  Customer(this._name, this._customerRegisterdOn, this._mobileNumber,
-      this._address);
+  Customer(this._customerId, this._name, this._mobileNumber, this._address,
+      this._customerRegisterdOn, this._customerRegisteredBy);
 
   String get name => _name;
 
@@ -23,7 +44,6 @@ class Customer{
     _name = value;
   }
 
-  DateTime get customerRegisterdOn => _customerRegisterdOn;
 
   String get address => _address;
 
@@ -37,9 +57,6 @@ class Customer{
     _mobileNumber = value;
   }
 
-  set customerRegisterdOn(DateTime value) {
-    _customerRegisterdOn = value;
-  }
 
   Customer.withId(this._id,this._name, this._customerRegisterdOn, this._mobileNumber, this._address);
 
@@ -49,6 +66,8 @@ class Customer{
     this._customerRegisterdOn = snapshot.value['registeredOn'];
     this._mobileNumber = snapshot.value['mobile'];
     this._address = snapshot.value['address'];
+    this._customerRegisteredBy = snapshot.value['registeredBy'];
+    this._customerId = snapshot.value['customerId'];
   }
 
   Map<String,dynamic> toJson(){
@@ -57,7 +76,9 @@ class Customer{
       "registeredOn" : _customerRegisterdOn,
       "mobile" : _mobileNumber,
       "address" : _address,
-      "userType" : "customer"
+      "userType" : "customer",
+      "registeredBy": _customerRegisteredBy,
+      "customerId": _customerId
     };
   }
 }

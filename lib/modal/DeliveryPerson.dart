@@ -9,6 +9,13 @@ class DeliveryPerson{
   String _registeredOn;
   String _mobileNumber;
   String _address;
+  String _createdBy;
+
+  String get createdBy => _createdBy;
+
+  set createdBy(String value) {
+    _createdBy = value;
+  }
 
   String get registeredOn => _registeredOn;
 
@@ -17,16 +24,11 @@ class DeliveryPerson{
   }
 
   DeliveryPerson(this._name, this._email, this._dateOfBirth, this._mobileNumber,this._registeredOn,
-      this._address);
+      this._address,this._createdBy);
 
   DeliveryPerson.withId(this._id,this._name, this._email, this._dateOfBirth,
-      this._mobileNumber,this._registeredOn, this._address);
+      this._mobileNumber,this._registeredOn, this._address,this._createdBy);
 
-
-  @override
-  String toString() {
-    return 'DeliveryPerson{_name: $_name, _email: $_email, _dateOfBirth: $_dateOfBirth, _registeredOn: $_registeredOn, _mobileNumber: $_mobileNumber, _address: $_address}';
-  }
 
   String get id => _id;
 
@@ -72,6 +74,7 @@ class DeliveryPerson{
     this._mobileNumber = snapshot.value['mobile'];
     this._address = snapshot.value['address'];
     this._email = snapshot.value['email'];
+    this._createdBy = snapshot.value['createdBy'];
   }
 
   Map<String,dynamic> toJson(){
@@ -82,7 +85,8 @@ class DeliveryPerson{
       "mobile" : _mobileNumber,
       "address" : _address,
       "email" : _email,
-      "userType" : "deliveryPerson"
+      "userType" : "deliveryPerson",
+      "createdBy" : _createdBy,
     };
   }
 

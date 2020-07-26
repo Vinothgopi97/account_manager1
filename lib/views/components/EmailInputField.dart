@@ -19,6 +19,7 @@ class EmailInputField extends StatelessWidget {
               hintText: "Email Id"
           ),
           showCursor: true,
+          keyboardType: TextInputType.emailAddress,
           validator: (input){
             if(!emailRegExp.hasMatch(input))
               return "Enter a valid email id";

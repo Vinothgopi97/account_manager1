@@ -1,6 +1,10 @@
+import 'package:account_manager/views/CreateCustomerAccountPage.dart';
 import 'package:account_manager/views/CreateDeliveryPersonAccountPage.dart';
+import 'package:account_manager/views/DeliveryPersonHomePage.dart';
 import 'package:account_manager/views/HomePage.dart';
 import 'package:account_manager/views/SigninPage.dart';
+import 'package:account_manager/views/ViewCustomers.dart';
+import 'package:account_manager/views/ViewDeliveryPersons.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -55,7 +59,7 @@ class MyApp extends StatelessWidget {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.normal,
-              color: Colors.purple
+              color: Colors.black54
           ),
           button: TextStyle(
             color: Colors.white,
@@ -68,8 +72,12 @@ class MyApp extends StatelessWidget {
       home: SigninPage(),
       routes: <String,WidgetBuilder> {
         "/signin": (builder) => SigninPage(),
-        "/home": (builder) => Home(),
+        "/adminhome": (builder) => Home(),
+        "/deliveryhome": (builder) => DeliveryPersonHome(),
         "/createdeliveryperson": (builder) => CreateDeliveryPersonAccountPage(),
+        "/viewdeliverypersons": (builder) => ViewDeliveryPersons(),
+        "/createcustomer": (builder) => CreateCustomerAccountPage(),
+        "/viewcustomers": (builder) => ViewCustomers(),
       },
     );
   }

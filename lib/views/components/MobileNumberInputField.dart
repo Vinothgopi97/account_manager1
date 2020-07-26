@@ -18,6 +18,7 @@ class MobileNumberInputField extends StatelessWidget {
           decoration: InputDecoration(
               hintText: "Mobile"
           ),
+          keyboardType: TextInputType.phone,
           showCursor: true,
           validator: (input){
             if(!mobileRegExp.hasMatch(input))

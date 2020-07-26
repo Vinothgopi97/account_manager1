@@ -1,24 +1,20 @@
+import 'package:account_manager/modal/Customer.dart';
 import 'package:account_manager/views/components/AddressInputField.dart';
-import 'package:account_manager/views/components/DateInputField.dart';
-import 'package:account_manager/views/components/EmailInputField.dart';
 import 'package:account_manager/views/components/MobileNumberInputField.dart';
 import 'package:account_manager/views/components/NameInputField.dart';
-import 'package:account_manager/views/components/PasswordInputField.dart';
 import 'package:account_manager/views/components/SignupButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../modal/DeliveryPerson.dart';
 
-
-class CreateDeliveryPersonAccountPage extends StatefulWidget {
+class CreateCustomerAccountPage extends StatefulWidget {
   @override
-  _CreateDeliveryPersonAccountPageState createState() => _CreateDeliveryPersonAccountPageState();
+  _CreateCustomerAccountPageState createState() => _CreateCustomerAccountPageState();
 }
 
-class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAccountPage> {
+class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   GlobalKey<FormState> _key = GlobalKey();
 
   FirebaseAuth _auth;
@@ -29,9 +25,9 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
 
   DatabaseReference _databaseReference;
 
+  DatabaseReference _idDataReference;
+
   String _name = "";
-  String _email = "";
-  String _dateOfBirth = "";
   String _registeredOn = "";
   String _mobileNumber = "";
   String _address = "";
@@ -74,21 +70,24 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
   void initState() {
     super.initState();
     _auth = FirebaseAuth.instance;
-    _databaseReference = FirebaseDatabase.instance.reference().child("deliveryperson");
+    _databaseReference = FirebaseDatabase.instance.reference().child("customer");
+    _idDataReference = FirebaseDatabase.instance.reference().child("customerid");
 //    this.checkAuthentication();
   }
 
-  signUp() async{
-   AuthResult res = await _auth.createUserWithEmailAndPassword(email: username, password: password);
-  }
-
-  saveDeliveryPerson() async{
-    if( _name.isNotEmpty && _email.isNotEmpty && _dateOfBirth.isNotEmpty && _mobileNumber.isNotEmpty && _address.isNotEmpty){
+  saveCustomer() async{
+    if( _name.isNotEmpty && _mobileNumber.isNotEmpty && _address.isNotEmpty){
       _registeredOn = DateTime.now().toString();
+
       user = await FirebaseAuth.instance.currentUser();
-      DeliveryPerson deliveryPerson = DeliveryPerson(_name,_email,_dateOfBirth,_mobileNumber,_registeredOn,_address,user.email);
-      await _databaseReference.push().set(deliveryPerson.toJson()).whenComplete(() => {
-            showSuccess("Delivery person account created"),
+      DataSnapshot snapshot = await _idDataReference.once();
+      int id = int.parse(snapshot.value["latestcustomerid"].toString());
+      Customer customer = Customer( id.toString(), _name, _mobileNumber, _address, DateTime.now().toString(), user.email);
+      id = id+1;
+      Map<String,dynamic> idmap = {"latestcustomerid":id};
+      await _databaseReference.push().set(customer.toJson()).whenComplete(()async => {
+          await _idDataReference.update(idmap),
+            showSuccess("Customer Added"),
           _key.currentState.reset()
     }).catchError((err)=>{
     showError(err.message)
@@ -100,7 +99,7 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create Delivery Person"),
+        title: Text("Add Customer"),
       ),
       body: SafeArea(child: Container(
         alignment: Alignment.center,
@@ -120,18 +119,13 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
                         child:Container(
                           height: MediaQuery.of(context).size.height,
                           child:  ListView(
+                            padding: EdgeInsets.symmetric(vertical: 50,horizontal: 10),
                             children: <Widget>[
                               NameInputField(_saveName),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               MobileNumberInputField(_saveMobile),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              DateInputField("Date Of Birth", _saveDateOfBirth),
-                              Padding(padding: EdgeInsets.only(top: 10)),
                               AddressInputFiled(_saveAddress),
-                              Padding(padding: EdgeInsets.only(top: 10)),
-                              EmailInputField(_saveUserName),
-                              Padding(padding: EdgeInsets.only(top: 10)),
-                              PasswordInputField(_savePassword),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               SignupButton(_key,_sendToNextScreen)
                             ],
@@ -152,14 +146,8 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     if(_key.currentState.validate())
     {
       _key.currentState.save();
-      signUp();
-      saveDeliveryPerson();
+      saveCustomer();
     }
-  }
-
-  _saveUserName(user){
-    this.username = user;
-    this._email = user;
   }
 
   _saveName(name){
@@ -174,11 +162,4 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     this._mobileNumber = mobile;
   }
 
-  _saveDateOfBirth(dob){
-    this._dateOfBirth = dob;
-  }
-
-  _savePassword(pass){
-    this.password = pass;
-  }
 }

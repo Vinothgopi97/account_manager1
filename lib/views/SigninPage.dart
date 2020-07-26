@@ -22,9 +22,19 @@ class _SigninPageState extends State<SigninPage> {
   FirebaseUser user;
 
   checkAuthentication() async {
+    print("In check auth");
     _auth.onAuthStateChanged.listen((user) async {
       if(user != null){
-        Navigator.of(context).pushReplacementNamed("/home");
+        if(user.uid == "sQAL8xDRgQWjRcVEqyxXQ4Yo44g2"){
+          //admin
+          print("admin");
+          Navigator.of(context).pushReplacementNamed("/adminhome");
+        }
+        else{
+          print("delivery person");
+          Navigator.of(context).pushReplacementNamed("/deliveryhome");
+        }
+
       }
     });
   }

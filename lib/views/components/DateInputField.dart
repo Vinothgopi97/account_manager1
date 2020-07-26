@@ -28,6 +28,10 @@ class _DateInputFieldState extends State<DateInputField> {
     return ListTile(
       leading: Icon(Icons.date_range,color: Theme.of(context).iconTheme.color,),
       title: DateTimeFormField(
+        decoration: InputDecoration(
+          hintText: hint,
+          labelText: hint
+        ),
         mode: DateFieldPickerMode.date,
         onSaved: (val){
           callback(DateFormat('yyyy-MM-dd').format(val).toString());
