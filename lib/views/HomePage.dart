@@ -1,3 +1,4 @@
+import 'package:account_manager/views/ViewDeliveryPersons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +38,7 @@ class _HomeState extends State<Home> {
   }
 
   signup(){
-    Navigator.pushNamed(context, "/signup");
+    Navigator.pushNamed(context, "/createdeliveryperson");
   }
 
   @override
@@ -61,7 +62,8 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               Text(isSignedin ? user.email : "Loading..."),
               RaisedButton(onPressed: signout, child: Text("Signout",style: Theme.of(context).textTheme.button,),),
-              RaisedButton(onPressed: signup, child: Text("SignUp",style: Theme.of(context).textTheme.button,),)
+              RaisedButton(onPressed: signup, child: Text("Create Delivery Person",style: Theme.of(context).textTheme.button,),),
+              ViewDeliveryPersons(),
             ],
           )
         ),

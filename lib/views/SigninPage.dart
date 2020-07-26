@@ -1,5 +1,5 @@
 import 'package:account_manager/views/components/EmailInputField.dart';
-import 'package:account_manager/views/components/PasswordInputFiled.dart';
+import 'package:account_manager/views/components/PasswordInputField.dart';
 import 'package:account_manager/views/components/SigninButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';

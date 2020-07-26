@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
       routes: <String,WidgetBuilder> {
         "/signin": (builder) => SigninPage(),
         "/home": (builder) => Home(),
-        "/signup": (builder) => CreateDeliveryPersonAccountPage(),
+        "/createdeliveryperson": (builder) => CreateDeliveryPersonAccountPage(),
       },
     );
   }

@@ -17,7 +17,7 @@ class SignupButton extends StatelessWidget {
       child: RaisedButton(
         onPressed: _fun,
         color: Theme.of(context).buttonColor,
-        child: Text("Sign Up",style: Theme.of(context).textTheme.button,),
+        child: Text("Create",style: Theme.of(context).textTheme.button,),
       ),
     );
   }

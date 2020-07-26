@@ -1,6 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 
-class DeliveryPerson{
+class Admin{
 
   String _id;
   String _name;
@@ -16,17 +16,12 @@ class DeliveryPerson{
     _registeredOn = value;
   }
 
-  DeliveryPerson(this._name, this._email, this._dateOfBirth, this._mobileNumber,this._registeredOn,
+  Admin(this._name, this._email, this._dateOfBirth, this._mobileNumber,
       this._address);
 
-  DeliveryPerson.withId(this._id,this._name, this._email, this._dateOfBirth,
-      this._mobileNumber,this._registeredOn, this._address);
+  Admin.withId(this._id,this._name, this._email, this._dateOfBirth,
+      this._mobileNumber, this._address);
 
-
-  @override
-  String toString() {
-    return 'DeliveryPerson{_name: $_name, _email: $_email, _dateOfBirth: $_dateOfBirth, _registeredOn: $_registeredOn, _mobileNumber: $_mobileNumber, _address: $_address}';
-  }
 
   String get id => _id;
 
@@ -64,25 +59,23 @@ class DeliveryPerson{
     _email = value;
   }
 
-  DeliveryPerson.fromSnapshot(DataSnapshot snapshot){
+  Admin.fromSnapshot(DataSnapshot snapshot){
     this._id = snapshot.key;
     this._name = snapshot.value['name'];
     this._dateOfBirth = snapshot.value['dataOfBirth'];
     this._registeredOn = snapshot.value['registeredOn'];
     this._mobileNumber = snapshot.value['mobile'];
     this._address = snapshot.value['address'];
-    this._email = snapshot.value['email'];
   }
 
   Map<String,dynamic> toJson(){
     return {
       "name" : _name,
       "registeredOn" : _registeredOn,
-      "dataOfBirth" : _dateOfBirth,
+      "dataOfBith" : _dateOfBirth,
       "mobile" : _mobileNumber,
       "address" : _address,
-      "email" : _email,
-      "userType" : "deliveryPerson"
+      "userType" : "admin"
     };
   }
 
