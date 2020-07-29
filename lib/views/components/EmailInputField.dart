@@ -6,15 +6,18 @@ class EmailInputField extends StatelessWidget {
 
   Function onSave;
 
-  EmailInputField(Function save){
-    onSave = save;
-  }
+  FocusNode current;
+  FocusNode next;
+
+
+  EmailInputField(this.onSave, this.current, this.next);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
         leading: Icon(Icons.email, color: Theme.of(context).iconTheme.color,),
         title: TextFormField(
+          focusNode: current,
           decoration: InputDecoration(
               hintText: "Email Id"
           ),
@@ -25,6 +28,7 @@ class EmailInputField extends StatelessWidget {
               return "Enter a valid email id";
           },
           onSaved: onSave,
+          onEditingComplete: next != null ? ()=> next.requestFocus() : null,
         )
     );
   }

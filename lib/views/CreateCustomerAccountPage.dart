@@ -1,5 +1,4 @@
 import 'package:account_manager/modal/Customer.dart';
-import 'package:account_manager/views/components/AddressInputField.dart';
 import 'package:account_manager/views/components/MobileNumberInputField.dart';
 import 'package:account_manager/views/components/NameInputField.dart';
 import 'package:account_manager/views/components/SignupButton.dart';
@@ -31,6 +30,10 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   String _registeredOn = "";
   String _mobileNumber = "";
   String _address = "";
+
+  FocusNode nameFocusNode;
+  FocusNode mobileFocusNode;
+  FocusNode addressFocusNode;
 
   showError(String error){
     showDialog(
@@ -72,17 +75,20 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
     _auth = FirebaseAuth.instance;
     _databaseReference = FirebaseDatabase.instance.reference().child("customer");
     _idDataReference = FirebaseDatabase.instance.reference().child("customerid");
+    nameFocusNode = FocusNode();
+    mobileFocusNode = FocusNode();
+    addressFocusNode = FocusNode();
 //    this.checkAuthentication();
   }
 
   saveCustomer() async{
-    if( _name.isNotEmpty && _mobileNumber.isNotEmpty && _address.isNotEmpty){
+    if( _name.isNotEmpty && _mobileNumber.isNotEmpty){
       _registeredOn = DateTime.now().toString();
 
       user = await FirebaseAuth.instance.currentUser();
       DataSnapshot snapshot = await _idDataReference.once();
       int id = int.parse(snapshot.value["latestcustomerid"].toString());
-      Customer customer = Customer( id.toString(), _name, _mobileNumber, _address, DateTime.now().toString(), user.email);
+      Customer customer = Customer( id.toString(), _name, _mobileNumber,DateTime.now().toString());
       id = id+1;
       Map<String,dynamic> idmap = {"latestcustomerid":id};
       await _databaseReference.push().set(customer.toJson()).whenComplete(()async => {
@@ -93,6 +99,14 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
     showError(err.message)
     });
   }
+  }
+
+  @override
+  void dispose() {
+    nameFocusNode.dispose();
+    mobileFocusNode.dispose();
+    addressFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -121,11 +135,11 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
                           child:  ListView(
                             padding: EdgeInsets.symmetric(vertical: 50,horizontal: 10),
                             children: <Widget>[
-                              NameInputField(_saveName),
+                              NameInputField(_saveName, nameFocusNode,mobileFocusNode),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              MobileNumberInputField(_saveMobile),
-                              Padding(padding: EdgeInsets.only(top: 10)),
-                              AddressInputFiled(_saveAddress),
+                              MobileNumberInputField(_saveMobile,mobileFocusNode,addressFocusNode),
+//                              Padding(padding: EdgeInsets.only(top: 10)),
+//                              AddressInputFiled(_saveAddress,addressFocusNode,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               SignupButton(_key,_sendToNextScreen)
                             ],

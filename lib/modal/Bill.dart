@@ -2,32 +2,31 @@ import 'package:firebase_database/firebase_database.dart';
 
 class Bill{
   String _id;
+  String _billId;
   String _customerId;
   String _customerName;
   double _litersDelivered;
   double _price;
-  String _billCreatedBy;
   String _billDate;
 
 
-  String get billCreatedBy => _billCreatedBy;
+  String get billId => _billId;
 
-  set billCreatedBy(String value) {
-    _billCreatedBy = value;
+  set billId(String value) {
+    _billId = value;
   }
 
-
   Bill(this._customerId, this._customerName, this._litersDelivered, this._price,
-      this._billCreatedBy, this._billDate);
+      this._billDate);
 
   Bill.fromSnapshot(DataSnapshot snapshot){
     this._id = snapshot.key;
     this._customerId = snapshot.value['customerId'];
     this._customerName = snapshot.value['customerName'];
-    this._litersDelivered = snapshot.value['litersDelivered'];
-    this._price = snapshot.value['billamount'];
-    this._billCreatedBy = snapshot.value['billCreatedBy'];
+    this._litersDelivered = double.parse(snapshot.value['litersDelivered'].toString());
+    this._price = double.parse(snapshot.value['billamount'].toString());
     this._billDate = snapshot.value['billDate'];
+    this._billId = snapshot.value["billId"];
   }
 
   Map<String,dynamic> toJson(){
@@ -36,8 +35,8 @@ class Bill{
       "customerName" : _customerName,
       "litersDelivered" : _litersDelivered,
       "billamount" : _price,
-      "billCreatedBy": _billCreatedBy,
-      "billDate": _billDate
+      "billDate": _billDate,
+      "billId": _customerId+"_"+DateTime.parse(_billDate).year.toString()+"-"+DateTime.parse(_billDate).month.toString()
     };
   }
 

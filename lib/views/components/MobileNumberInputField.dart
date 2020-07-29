@@ -6,15 +6,18 @@ class MobileNumberInputField extends StatelessWidget {
 
   Function onSave;
 
-  MobileNumberInputField(Function save){
-    onSave = save;
-  }
+  FocusNode current;
+  FocusNode next;
+
+
+  MobileNumberInputField(this.onSave, this.current, this.next);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
         leading: Icon(Icons.phone, color: Theme.of(context).iconTheme.color,),
         title: TextFormField(
+          focusNode: current,
           decoration: InputDecoration(
               hintText: "Mobile"
           ),
@@ -25,6 +28,7 @@ class MobileNumberInputField extends StatelessWidget {
               return "Enter a valid mobile number";
           },
           onSaved: onSave,
+          onEditingComplete: ()=> next!= null ? next.requestFocus() : null,
         )
     );
   }

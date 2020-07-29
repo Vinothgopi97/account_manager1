@@ -67,12 +67,12 @@ class _HomeState extends State<Home> {
         child: Center(
           child: Column(
             children: <Widget>[
-              Text(isSignedin ? user.email : "Loading..."),
+//              Text(isSignedin ? user.email : "Loading..."),
               RaisedButton(onPressed: signout, child: Text("Signout",style: Theme.of(context).textTheme.button,),),
-              RaisedButton(onPressed: gotoCreateDeliveryPersonPage, child: Text("Create Delivery Person",style: Theme.of(context).textTheme.button,),),
-              RaisedButton(onPressed: ()=>{
-                Navigator.of(context).pushNamed("/viewdeliverypersons")
-              }, child: Text("View Delivery Persons",style: Theme.of(context).textTheme.button,),),
+//              RaisedButton(onPressed: gotoCreateDeliveryPersonPage, child: Text("Create Delivery Person",style: Theme.of(context).textTheme.button,),),
+//              RaisedButton(onPressed: ()=>{
+//                Navigator.of(context).pushNamed("/viewdeliverypersons")
+//              }, child: Text("View Delivery Persons",style: Theme.of(context).textTheme.button,),),
               RaisedButton(onPressed: gotoCreateCustomerPage, child: Text("Create Customer",style: Theme.of(context).textTheme.button,),),
               RaisedButton(onPressed: gotoViewCustomerPage, child: Text("View Customers",style: Theme.of(context).textTheme.button,),),
 

@@ -4,15 +4,18 @@ class NameInputField extends StatelessWidget {
 
   Function onSave;
 
-  NameInputField(Function save){
-    onSave = save;
-  }
+  FocusNode current;
+  FocusNode next;
+
+
+  NameInputField(this.onSave, this.current, this.next);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
         leading: Icon(Icons.account_circle, color: Theme.of(context).iconTheme.color,),
         title: TextFormField(
+          focusNode: current,
           decoration: InputDecoration(
               hintText: "Name"
           ),
@@ -22,6 +25,7 @@ class NameInputField extends StatelessWidget {
               return "Enter Name";
           },
           onSaved: onSave,
+          onEditingComplete: ()=> next!=null ? next.requestFocus():null,
         )
     );
   }

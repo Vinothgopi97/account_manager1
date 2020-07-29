@@ -4,15 +4,18 @@ class PasswordInputField extends StatelessWidget {
 
   Function onSave;
 
-  PasswordInputField(Function save){
-    onSave = save;
-  }
+  FocusNode current;
+  FocusNode next;
+
+
+  PasswordInputField(this.onSave, this.current, this.next);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
         leading: Icon(Icons.vpn_key, color: Theme.of(context).iconTheme.color),
         title: TextFormField(
+          focusNode: current,
           decoration: InputDecoration(
               hintText: "Password",
           ),
@@ -23,6 +26,7 @@ class PasswordInputField extends StatelessWidget {
               return "Password must be atleast 8 characters long";
           },
           onSaved: onSave,
+          onEditingComplete: next != null ? ()=> next.requestFocus() : null,
         )
     );
   }

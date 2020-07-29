@@ -36,6 +36,12 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
   String _mobileNumber = "";
   String _address = "";
 
+  FocusNode nameNode;
+  FocusNode emailNode;
+  FocusNode mobileNode;
+  FocusNode passwordNode;
+  FocusNode addressNode;
+
   showError(String error){
     showDialog(
       context: context,
@@ -75,8 +81,14 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     super.initState();
     _auth = FirebaseAuth.instance;
     _databaseReference = FirebaseDatabase.instance.reference().child("deliveryperson");
+    emailNode = FocusNode();
+    passwordNode = FocusNode();
+    mobileNode = FocusNode();
+    nameNode = FocusNode();
+    addressNode = FocusNode();
 //    this.checkAuthentication();
   }
+
 
   signUp() async{
    AuthResult res = await _auth.createUserWithEmailAndPassword(email: username, password: password);
@@ -94,6 +106,16 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     showError(err.message)
     });
   }
+  }
+
+  @override
+  void dispose() {
+    emailNode.dispose();
+    passwordNode.dispose();
+    nameNode.dispose();
+    mobileNode.dispose();
+    addressNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -121,17 +143,17 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
                           height: MediaQuery.of(context).size.height,
                           child:  ListView(
                             children: <Widget>[
-                              NameInputField(_saveName),
+                              NameInputField(_saveName,nameNode,mobileNode),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              MobileNumberInputField(_saveMobile),
+                              MobileNumberInputField(_saveMobile,mobileNode,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              DateInputField("Date Of Birth", _saveDateOfBirth),
+                              DateInputField(_saveDateOfBirth,"Date Of Birth",null,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              AddressInputFiled(_saveAddress),
+                              AddressInputFiled(_saveAddress,addressNode,emailNode),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              EmailInputField(_saveUserName),
+                              EmailInputField(_saveUserName,emailNode,passwordNode),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              PasswordInputField(_savePassword),
+                              PasswordInputField(_savePassword,passwordNode,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               SignupButton(_key,_sendToNextScreen)
                             ],

@@ -67,7 +67,7 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
         child: Center(
           child: Column(
             children: <Widget>[
-              Text(isSignedin ? user.email : "Loading..."),
+//              Text(isSignedin ? user.email : "Loading..."),
               RaisedButton(onPressed: signout, child: Text("Signout",style: Theme.of(context).textTheme.button,),),
 
               RaisedButton(onPressed: gotoViewCustomerPage, child: Text("View Customers",style: Theme.of(context).textTheme.button,),),
