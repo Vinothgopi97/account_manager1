@@ -113,7 +113,10 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Customer"),
+        iconTheme: IconThemeData(
+          color: Colors.white, //change your color here
+        ),
+        title: Text("Add Customer",style: TextStyle(color: Colors.white),),
       ),
       body: SafeArea(child: Container(
         alignment: Alignment.center,
@@ -131,7 +134,7 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
                     Form(
                         key: _key,
                         child:Container(
-                          height: MediaQuery.of(context).size.height,
+                          height: 400,
                           child:  ListView(
                             padding: EdgeInsets.symmetric(vertical: 50,horizontal: 10),
                             children: <Widget>[

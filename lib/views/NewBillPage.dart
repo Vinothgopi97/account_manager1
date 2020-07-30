@@ -12,24 +12,27 @@ class NewBillPage extends StatefulWidget {
 
   String customerId;
   String customerName;
+  String mobile;
+  Map<String,double> priceList;
 
-  NewBillPage(this.customerId, this.customerName);
+  NewBillPage(this.customerId, this.customerName,this.mobile,this.priceList);
 
   @override
-  _NewBillPageState createState() => _NewBillPageState(this.customerId, this.customerName);
+  _NewBillPageState createState() => _NewBillPageState(this.customerId, this.customerName,this.mobile,this.priceList);
 }
 
 class _NewBillPageState extends State<NewBillPage> {
 
   String customerId;
   String customerName;
+  String mobile;
+  Map<String,double> price;
 
-  Map<String,double> price = {"0.5":20,"1":35};
   List<String> liters;
   String selected;
   SmsSender sender;
-  String mobile = "+918760603355";
-  _NewBillPageState(this.customerId, this.customerName);
+//  String mobile = "+918760603355";
+  _NewBillPageState(this.customerId, this.customerName,this.mobile,this.price);
 
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child("bill");
 
@@ -38,12 +41,13 @@ class _NewBillPageState extends State<NewBillPage> {
 
   @override
   void initState() {
-    liters = price.keys.toList();
-    selected = liters.elementAt(0);
+
     sender = new SmsSender();
  total = 0;
  billIdKeyString = customerId+"_"+DateTime.now().year.toString()+"-"+DateTime.now().month.toString();
- print(billIdKeyString);
+ print(price);
+    liters = price.keys.toList();
+    selected = liters.elementAt(0);
 //    getTotal();
     super.initState();
   }
@@ -68,71 +72,99 @@ class _NewBillPageState extends State<NewBillPage> {
 
   @override
   Widget build(BuildContext context) {
+    total=0;
     return Scaffold(
         appBar: AppBar(
-          title: Text("New Bill"),
+          iconTheme: IconThemeData(
+            color: Colors.white, //change your color here
+          ),
+          title: Text("New Bill",style: TextStyle(color: Colors.white),),
+          actions: <Widget>[
+            IconButton(icon: Icon(Icons.message,color: Colors.white,), onPressed: _sendMMonthlyBill),
+          ],
         ),
         body:Column(
           children: <Widget>[
             Form(
                 key: _key,
                 child:Container(
-                  height: 200,
-                  child:  ListView(
-                    padding: EdgeInsets.symmetric(vertical: 50,horizontal: 10),
-                    children: <Widget>[
-                      Text("Customer Id: "+customerId.toString()),
-                      Padding(padding: EdgeInsets.only(top: 10)),
-                      Text("Customer Name: "+ customerName),
-                      Padding(padding: EdgeInsets.only(top: 10)),
-                      DropdownButton<String>(
-                        items: liters.map<DropdownMenuItem<String>>((e){
-                          return DropdownMenuItem<String>(
-                              value: e.toString(),
-                              child: Row(
-                                children: <Widget>[
-                                  SizedBox(width: 10,),
-                                  Text(e.toString()),
-                                ],
-                              ));
-                        }).toList(),
-                        onChanged: (e){
-                          setState(() {
-                            selected= e.toString();
-                          });
-                        },
-                        value: selected,
+                  height: 250,
+                  child: Card(
+                    child:  Column(
+                      children: <Widget>[
+                        Padding(padding: EdgeInsets.only(top: 10)),
+                        Text("Customer Id: "+customerId.toString()),
+                        Padding(padding: EdgeInsets.only(top: 10)),
+                        Text("Customer Name: "+ customerName),
+                        Padding(padding: EdgeInsets.only(top: 10)),
+                        Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Lliters delivered"),
+                              DropdownButton<String>(
+                                items: liters.map<DropdownMenuItem<String>>((e){
+                                  return DropdownMenuItem<String>(
+                                      value: e.toString(),
+                                      child: Row(
+                                        children: <Widget>[
+                                          SizedBox(width: 10,),
+                                          Text(e.toString()),
+                                        ],
+                                      ));
+                                }).toList(),
+                                onChanged: (e){
+                                  setState(() {
+                                    selected= e.toString();
+                                  });
+                                },
+                                value: selected,
 
-                      ),
-                      RaisedButton(
-                          child: Text("Add Bill"),
-                          onPressed: addBill),
+                              ),
+                            ],
+                          ),),
+                        RaisedButton(
+                            child: Text("Add Bill",style: Theme.of(context).textTheme.button,),
+                            onPressed: addBill),
 
-                    ],
-                  ),
+                      ],
+                    ),
+                  )
                 )
             ),
-            Container(
-              height: 300,
-              child: FirebaseAnimatedList(
 
-                shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  defaultChild: CircularProgressIndicator(),
-                  query: _databaseReference.orderByChild("billId").equalTo(billIdKeyString),
-                  itemBuilder: (context,snapshot,animation,index){
-                    Bill bill = Bill.fromSnapshot(snapshot);
+            Column(
+              children: <Widget>[
+                ListTile(
+                  dense: true,
+                  leading: Text("Liters"),
+                  title: Text("Date"),
+                  trailing: Text("Amount"),
+                ),
+                Container(
+                  height: 300,
+                  child: FirebaseAnimatedList(
+
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    defaultChild: Center(child: CircularProgressIndicator(),),
+                    query: _databaseReference.orderByChild("billId").equalTo(billIdKeyString),
+                    itemBuilder: (context,snapshot,animation,index){
+                      Bill bill = Bill.fromSnapshot(snapshot);
                       total = total + double.parse(bill.price.toString());
                       print(total);
-                    return ListTile(
-                      leading: Text(bill.litersDelivered.toString()),
-                      title: Text(bill.billDate),
-                      trailing: Text(bill.price.toString()),
-                    );
-                  },
+                      return ListTile(
+                        dense: true,
+                        leading: Text(bill.litersDelivered.toString()),
+                        title: Text(bill.billDate),
+                        trailing: Text("₹ "+bill.price.toString()),
+                      );
+                    },
 
-              ),
-            ),
+                  ),
+                ),
+              ],
+            )
           ],
         )
 
@@ -169,8 +201,9 @@ class _NewBillPageState extends State<NewBillPage> {
     double oldTotal = total;
     total = 0;
     String date = DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
+    String month = DateFormat('yyyy-MM').format(DateTime.now()).toString();
     Bill bill = Bill(customerId, customerName, double.parse(selected), price[selected] , date);
-    String text = "Existing bill: ₹"+ oldTotal.toString()+", current bill: ₹"+price[selected].toString()+"\n Total bill: ₹"+ (oldTotal+price[selected]).toString();
+    String text = "Milk bill\nExisting:₹"+ oldTotal.toString()+"\nNew:₹"+price[selected].toString()+".\nTotal: ₹"+ (oldTotal+price[selected]).toString();
     await _databaseReference.push().set(bill.toJson()).whenComplete(()async => {
       sender.sendSms(new SmsMessage(mobile, text)),
 //      await sendSMS(message: text, recipients: ["+918760603355"]),
@@ -178,6 +211,18 @@ class _NewBillPageState extends State<NewBillPage> {
       _key.currentState.reset(),
     }).catchError((err)=>{
       showError(err.message)
+    });
+  }
+
+  _sendMMonthlyBill(){
+    double total1 = total;
+    String month = DateFormat('yyyy-MM').format(DateTime.now()).toString();
+    String text = "Total milk bill for the month "+month+" is ₹ "+total1.toString();
+    print(mobile);
+    sender.sendSms(new SmsMessage(mobile, text)).then((message) => {
+      showSuccess("Monthly bill sent, Message: "+text),
+    }).catchError((e)=>{
+      showError(e.message),
     });
   }
 }
