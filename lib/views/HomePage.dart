@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:account_manager/modal/Customer.dart';
 import 'package:account_manager/modal/DeliveryPerson.dart';
 import 'package:account_manager/views/NewBillPage.dart';
-import 'package:account_manager/views/ViewDeliveryPerson.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
@@ -108,7 +107,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
 
         bottom: TabBar(
-          indicatorColor: Colors.blue,
+          indicatorColor: Colors.white,
           tabs: [
             Tab( child: Text("Customers",style: TextStyle(color: Colors.white),),),
             Tab( child: Text("Delivery Persons",style: TextStyle(color: Colors.white),),),
@@ -117,7 +116,7 @@ class _HomeState extends State<Home> {
         iconTheme: IconThemeData(
           color: Colors.white, //change your color here
         ),
-        title: Text("Milk Account Management", style: Theme.of(context).appBarTheme.textTheme.headline1,),
+        title: Text("Milk Bill Manager", style: Theme.of(context).appBarTheme.textTheme.headline1,),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.lock,color: Colors.white,), onPressed: logout),
         ],
@@ -164,7 +163,7 @@ class _HomeState extends State<Home> {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    NewBillPage(customer,price)
+                                    NewBillPage(customer,price,true)
                             ),
                           )
                         })

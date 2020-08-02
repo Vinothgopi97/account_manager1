@@ -1,6 +1,11 @@
+import 'dart:collection';
+
+import 'package:account_manager/modal/Customer.dart';
 import 'package:account_manager/modal/DeliveryPerson.dart';
+import 'package:account_manager/views/NewBillPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 
 class DeliveryPersonHome extends StatefulWidget {
@@ -62,6 +67,33 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
   gotoViewCustomerPage(){
     Navigator.pushNamed(context, "/viewcustomers");
   }
+  Map<String,double> price = {};
+
+  getPriceList() async {
+    LinkedHashMap priceList;
+    await _databaseReference.child("config").child("price").onValue.listen((event) {
+      priceList = event.snapshot.value;
+      priceList.forEach((key, value) {
+        String k = key.replaceAll('point', '.');
+        double val = double.parse(value.toString());
+        price.putIfAbsent(k, () => val);
+      });
+    });
+  }
+
+  logout(){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text("Are You Sure"),
+        content: Text("Are you sure to signout."),
+        actions: <Widget>[
+          FlatButton(onPressed: ()=> Navigator.of(context).pop(), child: Text("No")),
+          FlatButton(onPressed: signout, child: Text("Yes"))
+        ],
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -72,6 +104,7 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
       _deliveryPerson = DeliveryPerson.fromSnapshot(event.snapshot);
     });
     this.checkAuthentication();
+    this.getPriceList();
     this.getUser();
     super.initState();
   }
@@ -81,23 +114,70 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
     final String username = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Delivery Person", style: Theme.of(context).appBarTheme.textTheme.headline1,),
+        title: Text("Milk Bill Manager", style: Theme.of(context).appBarTheme.textTheme.headline1,),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.lock,color: Colors.white,), onPressed: logout),
+        ],
       ),
-      body: isSignedin? Container(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-//              Text(isSignedin ? user.email : "Loading..."),
-              RaisedButton(onPressed: signout, child: Text("Signout",style: Theme.of(context).textTheme.button,),),
+      body: isSignedin? FirebaseAnimatedList(
+          shrinkWrap: true,
+          padding: EdgeInsets.symmetric(vertical: 5),
+          query: _databaseReference.child("customer").orderByChild("deliveryPersonId").equalTo(_deliveryPersonId),
+          defaultChild: Center(child: CircularProgressIndicator(),),
+          itemBuilder: (context,snapshot,animation,index){
+            Customer customer = Customer.fromSnapshot(snapshot);
+            return Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(10.0),
+                    top: Radius.circular(2.0)),
+              ),
+              margin: EdgeInsets.all(5),
+              child: ListTile(
+                dense: true,
+                title: Text(customer.name,style: TextStyle(fontSize: 20,letterSpacing: 0.9),),
+                subtitle: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.only(top:5),child: Text(customer.mobileNumber),),
+                    Padding(padding: EdgeInsets.only(top:5),child: Text("Delivery person: "+customer.deliveryPersonName),),
 
-              RaisedButton(onPressed: gotoViewCustomerPage, child: Text("View Customers",style: Theme.of(context).textTheme.button,),),
-
-            ],
-          )
-        ),
+                  ],
+                ),
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).backgroundColor,
+                  child: Text(customer.customerId, style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    IconButton(icon: Icon(Icons.add_circle),
+                        color: Theme.of(context).iconTheme.color,
+                        onPressed: ()=>{
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    NewBillPage(customer,price,false)
+                            ),
+                          )
+                        })
+                  ],
+                ),
+//                  onTap: ()=>{
+//                    Navigator.of(context).push(
+//                      MaterialPageRoute(
+//                          builder: (context) =>
+//                              ViewDeliveryPerson(deliveryPerson.id)
+//                      ),
+//                    )
+//                  },
+              ),
+            );
+          }
       ) : Center(
         child: CircularProgressIndicator(),
-      )
+      ),
     );
   }
 }

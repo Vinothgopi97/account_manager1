@@ -14,12 +14,14 @@ class NewBillPage extends StatefulWidget {
 
   Customer customer;
 
+  bool isAdmin;
+
   Map<String,double> priceList;
 
-  NewBillPage(this.customer,this.priceList);
+  NewBillPage(this.customer,this.priceList,this.isAdmin);
 
   @override
-  _NewBillPageState createState() => _NewBillPageState(this.customer,this.priceList);
+  _NewBillPageState createState() => _NewBillPageState(this.customer,this.priceList,this.isAdmin);
 }
 
 class _NewBillPageState extends State<NewBillPage> {
@@ -30,11 +32,13 @@ class _NewBillPageState extends State<NewBillPage> {
   Customer customer;
   Map<String,double> price;
 
+  bool isAdmin;
+
   List<String> liters;
   String selected;
   SmsSender sender;
 //  String mobile = "+918760603355";
-  _NewBillPageState(this.customer,this.price);
+  _NewBillPageState(this.customer,this.price,this.isAdmin);
 
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child("bill");
   DatabaseReference _customerDatabaseRef = FirebaseDatabase.instance.reference().child("customer");
@@ -79,7 +83,6 @@ class _NewBillPageState extends State<NewBillPage> {
   }
 
   newMobileSave() async{
-
     if(_editNumKey.currentState.validate()){
       _editNumKey.currentState.save();
       if(customer.mobileNumber == mobile){
@@ -152,14 +155,14 @@ class _NewBillPageState extends State<NewBillPage> {
                             Padding(padding: EdgeInsets.only(top: 10)),
                             Text("Customer Id: "+customer.customerId),
                             Padding(padding: EdgeInsets.only(top: 10)),
-                            Row(
+                            isAdmin ? Row(
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text("Mobile: "+ customer.mobileNumber),
                                 IconButton(icon: Icon(Icons.edit), onPressed: editMobile)
                               ],
-                            ),
+                            ) : Text("Mobile: "+ customer.mobileNumber),
                             Padding(padding: EdgeInsets.only(top: 10)),
                             Text("Customer Name: "+ customer.name),
                             Padding(padding: EdgeInsets.only(top: 10)),

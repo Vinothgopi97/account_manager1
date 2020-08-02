@@ -30,9 +30,10 @@ class _SigninPageState extends State<SigninPage> {
       print("User mobile "+user.phoneNumber);
       print("Admin mobile"+adminMobile.toString());
       if(user != null && user.phoneNumber == adminMobile){
-        Navigator.of(context).popAndPushNamed("/adminhome");
+        Navigator.of(context).pushReplacementNamed("/adminhome");
       }
       else if(user != null){
+        print("DELIVERY PERSON");
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
               builder: (context) =>
@@ -96,7 +97,9 @@ class _SigninPageState extends State<SigninPage> {
                                  showError(e.message)
                                });
                                if(res.user != null)
+                               {
                                  Navigator.of(context).pop();
+                               }
                              }, child: Text("Signin"))
                            ],
                          ),
