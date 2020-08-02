@@ -37,7 +37,7 @@ class _ViewDeliveryPersonsState extends State<ViewDeliveryPersons> {
               return Card(
                 child: ListTile(
                   title: Text(deliveryPerson.name),
-                  subtitle: Text(deliveryPerson.email),
+                  subtitle: Text(deliveryPerson.mobileNumber),
                   onTap: ()=>{
                     Navigator.of(context).push(
                       MaterialPageRoute(

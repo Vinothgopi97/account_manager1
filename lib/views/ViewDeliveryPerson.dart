@@ -62,13 +62,7 @@ class _ViewDeliveryPersonState extends State<ViewDeliveryPerson> {
                     Text(_deliveryPerson.name, style: Theme.of(context).textTheme.headline2,),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text("Email :", style: Theme.of(context).textTheme.headline2,),
-                    Text(_deliveryPerson.email , style: Theme.of(context).textTheme.headline2,),
-                  ],
-                ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -76,20 +70,7 @@ class _ViewDeliveryPersonState extends State<ViewDeliveryPerson> {
                     Text(_deliveryPerson.mobileNumber , style: Theme.of(context).textTheme.headline2,),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text("Date of Birth :", style: Theme.of(context).textTheme.headline2,),
-                    Text(_deliveryPerson.dateOfBirth, style: Theme.of(context).textTheme.headline2,),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text("Address :", style: Theme.of(context).textTheme.headline2,),
-                    Text(_deliveryPerson.address, style: Theme.of(context).textTheme.headline2,),
-                  ],
-                ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -98,7 +79,6 @@ class _ViewDeliveryPersonState extends State<ViewDeliveryPerson> {
                   ],
                 ),
                 Text("Registered by :", style: Theme.of(context).textTheme.headline2,),
-                Text(_deliveryPerson.createdBy, style: Theme.of(context).textTheme.headline2,),
               ],
             ),
           ),

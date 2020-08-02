@@ -1,9 +1,5 @@
-import 'package:account_manager/views/components/AddressInputField.dart';
-import 'package:account_manager/views/components/DateInputField.dart';
-import 'package:account_manager/views/components/EmailInputField.dart';
 import 'package:account_manager/views/components/MobileNumberInputField.dart';
 import 'package:account_manager/views/components/NameInputField.dart';
-import 'package:account_manager/views/components/PasswordInputField.dart';
 import 'package:account_manager/views/components/SignupButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -27,7 +23,8 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
 
   FirebaseUser user;
 
-  DatabaseReference _databaseReference;
+  DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child("deliveryperson");
+  DatabaseReference _idDataReference  = FirebaseDatabase.instance.reference().child("config");
 
   String _name = "";
   String _email = "";
@@ -78,33 +75,53 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
 
   @override
   void initState() {
-    super.initState();
+
     _auth = FirebaseAuth.instance;
-    _databaseReference = FirebaseDatabase.instance.reference().child("deliveryperson");
     emailNode = FocusNode();
     passwordNode = FocusNode();
     mobileNode = FocusNode();
     nameNode = FocusNode();
     addressNode = FocusNode();
 //    this.checkAuthentication();
+    super.initState();
   }
 
 
-  signUp() async{
-   AuthResult res = await _auth.createUserWithEmailAndPassword(email: username, password: password);
-  }
+//  signUp() async{
+//   AuthResult res = await _auth.createUserWithEmailAndPassword(email: username, password: password);
+//  }
+//
 
   saveDeliveryPerson() async{
-    if( _name.isNotEmpty && _email.isNotEmpty && _dateOfBirth.isNotEmpty && _mobileNumber.isNotEmpty && _address.isNotEmpty){
+    if( _name.isNotEmpty  && _mobileNumber.isNotEmpty ){
       _registeredOn = DateTime.now().toString();
       user = await FirebaseAuth.instance.currentUser();
-      DeliveryPerson deliveryPerson = DeliveryPerson(_name,_email,_dateOfBirth,_mobileNumber,_registeredOn,_address,user.email);
-      await _databaseReference.push().set(deliveryPerson.toJson()).whenComplete(() => {
-            showSuccess("Delivery person account created"),
-          _key.currentState.reset()
-    }).catchError((err)=>{
-    showError(err.message)
-    });
+
+      DataSnapshot snapshot = await _idDataReference.once();
+      int id = int.parse(snapshot.value["latestdeliverypersonid"].toString());
+
+      DeliveryPerson deliveryPerson = DeliveryPerson(id.toString(),_name,_mobileNumber,_registeredOn);
+//      Map<String, dynamic> m = {id.toString():deliveryPerson.toJson()};
+      String old = id.toString();
+      id = id+1;
+      Map<String,dynamic> idmap = {"latestdeliverypersonid":id};
+
+      await _databaseReference.child(old).set(deliveryPerson.toJson()).whenComplete(() async => {
+        await _idDataReference.update(idmap),
+        await FirebaseDatabase.instance.reference().child("config").child("deliverypersons").child(old).set(deliveryPerson.name),
+        await FirebaseDatabase.instance.reference().child("config").child("users").child("deliveryperson").child(old).set("+91"+deliveryPerson.mobileNumber),
+        showSuccess("Delivery person account created"),
+        _key.currentState.reset()
+      }).catchError((err)=>{
+        showError(err.message)
+      });
+//      await _databaseReference.push().set(deliveryPerson.toJson()).whenComplete(() async => {
+//        await _idDataReference.update(idmap),
+//            showSuccess("Delivery person account created"),
+//          _key.currentState.reset()
+//    }).catchError((err)=>{
+//    showError(err.message)
+//    });
   }
   }
 
@@ -122,7 +139,10 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create Delivery Person"),
+        iconTheme: IconThemeData(
+          color: Colors.white, //change your color here
+        ),
+        title: Text("Create Delivery Person", style: TextStyle(color: Colors.white),),
       ),
       body: SafeArea(child: Container(
         alignment: Alignment.center,
@@ -147,14 +167,14 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
                               Padding(padding: EdgeInsets.only(top: 10)),
                               MobileNumberInputField(_saveMobile,mobileNode,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              DateInputField(_saveDateOfBirth,"Date Of Birth",null,null),
-                              Padding(padding: EdgeInsets.only(top: 10)),
-                              AddressInputFiled(_saveAddress,addressNode,emailNode),
-                              Padding(padding: EdgeInsets.only(top: 10)),
-                              EmailInputField(_saveUserName,emailNode,passwordNode),
-                              Padding(padding: EdgeInsets.only(top: 10)),
-                              PasswordInputField(_savePassword,passwordNode,null),
-                              Padding(padding: EdgeInsets.only(top: 10)),
+//                              DateInputField(_saveDateOfBirth,"Date Of Birth",null,null),
+//                              Padding(padding: EdgeInsets.only(top: 10)),
+//                              AddressInputFiled(_saveAddress,addressNode,emailNode),
+//                              Padding(padding: EdgeInsets.only(top: 10)),
+//                              EmailInputField(_saveUserName,emailNode,passwordNode),
+//                              Padding(padding: EdgeInsets.only(top: 10)),
+//                              PasswordInputField(_savePassword,passwordNode,null),
+//                              Padding(padding: EdgeInsets.only(top: 10)),
                               SignupButton(_key,_sendToNextScreen)
                             ],
                           ),
@@ -174,7 +194,7 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     if(_key.currentState.validate())
     {
       _key.currentState.save();
-      signUp();
+//      signUp();
       saveDeliveryPerson();
     }
   }

@@ -23,6 +23,7 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   FirebaseUser user;
 
   DatabaseReference _databaseReference;
+  DatabaseReference _deliveryDatabaseReference;
 
   DatabaseReference _idDataReference;
 
@@ -69,16 +70,48 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
     });
   }
 
+  Map<String,String> deliveryPersons={};
+  List<String> deliverypersonNames;
+  String selected = "";
   @override
   void initState() {
     super.initState();
     _auth = FirebaseAuth.instance;
     _databaseReference = FirebaseDatabase.instance.reference().child("customer");
-    _idDataReference = FirebaseDatabase.instance.reference().child("customerid");
+    _idDataReference = FirebaseDatabase.instance.reference().child("config");
+    _deliveryDatabaseReference = FirebaseDatabase.instance.reference().child("deliveryperson");
+    deliveryPersons = {};
+    deliverypersonNames = List();
+    getDeliveryPersons();
     nameFocusNode = FocusNode();
     mobileFocusNode = FocusNode();
     addressFocusNode = FocusNode();
 //    this.checkAuthentication();
+  }
+
+  getDeliveryPersons() async{
+
+    await FirebaseDatabase.instance.reference().child("config").child("deliverypersons").onValue.listen((event) {
+      DataSnapshot snapshot = event.snapshot;
+//      LinkedHashMap<dynamic,dynamic> m = snapshot.value;
+      print(snapshot.value);
+      List<dynamic> m = snapshot.value;
+      setState(() {
+        deliverypersonNames = m.cast();
+        selected = deliverypersonNames.length >= 1 ? deliverypersonNames.elementAt(0) : "No Delivery Persons available";
+      });
+      for(int j=0;j< deliverypersonNames.length;j++){
+        deliveryPersons.putIfAbsent(deliverypersonNames.elementAt(j), () => j.toString());
+      }
+//      m.forEach((key, value) {
+//        deliveryPersons.putIfAbsent(value, () => key);
+//        setState(() {
+//          deliverypersonNames.add(value);
+//        });
+//        selected = deliverypersonNames.length >= 1 ? deliverypersonNames.elementAt(0) : "No Delivery Persons available";
+//      });
+    });
+
   }
 
   saveCustomer() async{
@@ -88,10 +121,12 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
       user = await FirebaseAuth.instance.currentUser();
       DataSnapshot snapshot = await _idDataReference.once();
       int id = int.parse(snapshot.value["latestcustomerid"].toString());
-      Customer customer = Customer( id.toString(), _name, _mobileNumber,DateTime.now().toString());
+      String deliveryPersonId = deliveryPersons[selected].toString();
+      String old = id.toString();
+      Customer customer = Customer( id.toString(), _name, _mobileNumber,deliveryPersonId,selected,DateTime.now().toString());
       id = id+1;
       Map<String,dynamic> idmap = {"latestcustomerid":id};
-      await _databaseReference.push().set(customer.toJson()).whenComplete(()async => {
+      await _databaseReference.child(old).set(customer.toJson()).whenComplete(()async => {
           await _idDataReference.update(idmap),
             showSuccess("Customer Added"),
           _key.currentState.reset()
@@ -144,6 +179,31 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
 //                              Padding(padding: EdgeInsets.only(top: 10)),
 //                              AddressInputFiled(_saveAddress,addressFocusNode,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text("Delivery Person"),
+                                  DropdownButton<String>(
+                                    items: deliverypersonNames.map<DropdownMenuItem<String>>((e){
+                                      return DropdownMenuItem<String>(
+                                          value: e.toString(),
+                                          child: Row(
+                                            children: <Widget>[
+                                              SizedBox(width: 10,),
+                                              Text(e.toString()),
+                                            ],
+                                          ));
+                                    }).toList(),
+                                    onChanged: (e){
+                                      setState(() {
+                                        selected= e.toString();
+                                      });
+                                    },
+                                    value: selected,
+
+                                  ),
+                                ],
+                              ),
                               SignupButton(_key,_sendToNextScreen)
                             ],
                           ),

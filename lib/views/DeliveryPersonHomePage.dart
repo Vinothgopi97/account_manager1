@@ -1,9 +1,17 @@
+import 'package:account_manager/modal/DeliveryPerson.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class DeliveryPersonHome extends StatefulWidget {
+
+  String _deliveryPersonId;
+
+
+  DeliveryPersonHome(this._deliveryPersonId);
+
   @override
-  _DeliveryPersonHomeState createState() => _DeliveryPersonHomeState();
+  _DeliveryPersonHomeState createState() => _DeliveryPersonHomeState(this._deliveryPersonId);
 }
 
 class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
@@ -11,6 +19,13 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseUser user;
   bool isSignedin = false;
+  String _deliveryPersonId;
+  DeliveryPerson _deliveryPerson;
+
+
+  DatabaseReference _databaseReference;
+
+  _DeliveryPersonHomeState(this._deliveryPersonId);
 
   checkAuthentication() async {
     _auth.onAuthStateChanged.listen((user) async {
@@ -50,10 +65,15 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
 
   @override
   void initState() {
-    super.initState();
+
     isSignedin = false;
+    _databaseReference = FirebaseDatabase.instance.reference();
+    _databaseReference.child("deliveryperson").child(_deliveryPersonId).onValue.listen((event) {
+      _deliveryPerson = DeliveryPerson.fromSnapshot(event.snapshot);
+    });
     this.checkAuthentication();
     this.getUser();
+    super.initState();
   }
 
   @override

@@ -17,6 +17,7 @@ class MobileNumberInputField extends StatelessWidget {
     return ListTile(
         leading: Icon(Icons.phone, color: Theme.of(context).iconTheme.color,),
         title: TextFormField(
+          maxLength: 10,
           focusNode: current,
           decoration: InputDecoration(
               hintText: "Mobile"
@@ -24,7 +25,7 @@ class MobileNumberInputField extends StatelessWidget {
           keyboardType: TextInputType.phone,
           showCursor: true,
           validator: (input){
-            if(!mobileRegExp.hasMatch(input))
+            if(!mobileRegExp.hasMatch(input) && input.length != 10)
               return "Enter a valid mobile number";
           },
           onSaved: onSave,
