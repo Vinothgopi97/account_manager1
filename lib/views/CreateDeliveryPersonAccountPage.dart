@@ -17,27 +17,16 @@ class CreateDeliveryPersonAccountPage extends StatefulWidget {
 class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAccountPage> {
   GlobalKey<FormState> _key = GlobalKey();
 
-  FirebaseAuth _auth;
-
-  String username, password;
-
   FirebaseUser user;
 
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child("deliveryperson");
   DatabaseReference _idDataReference  = FirebaseDatabase.instance.reference().child("config");
 
   String _name = "";
-  String _email = "";
-  String _dateOfBirth = "";
   String _registeredOn = "";
   String _mobileNumber = "";
-  String _address = "";
-
   FocusNode nameNode;
-  FocusNode emailNode;
   FocusNode mobileNode;
-  FocusNode passwordNode;
-  FocusNode addressNode;
 
   showError(String error){
     showDialog(
@@ -69,12 +58,10 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
   @override
   void initState() {
 
-    _auth = FirebaseAuth.instance;
-    emailNode = FocusNode();
-    passwordNode = FocusNode();
+
+
     mobileNode = FocusNode();
     nameNode = FocusNode();
-    addressNode = FocusNode();
     super.initState();
   }
 
@@ -113,11 +100,8 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
 
   @override
   void dispose() {
-    emailNode.dispose();
-    passwordNode.dispose();
     nameNode.dispose();
     mobileNode.dispose();
-    addressNode.dispose();
     super.dispose();
   }
 
@@ -154,14 +138,6 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
                               Padding(padding: EdgeInsets.only(top: 10)),
                               MobileNumberInputField(_saveMobile,mobileNode,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
-//                              DateInputField(_saveDateOfBirth,"Date Of Birth",null,null),
-//                              Padding(padding: EdgeInsets.only(top: 10)),
-//                              AddressInputFiled(_saveAddress,addressNode,emailNode),
-//                              Padding(padding: EdgeInsets.only(top: 10)),
-//                              EmailInputField(_saveUserName,emailNode,passwordNode),
-//                              Padding(padding: EdgeInsets.only(top: 10)),
-//                              PasswordInputField(_savePassword,passwordNode,null),
-//                              Padding(padding: EdgeInsets.only(top: 10)),
                               SignupButton(_key,_sendToNextScreen)
                             ],
                           ),

@@ -112,19 +112,14 @@ class _SigninPageState extends State<SigninPage> {
         showError(e.message);
       }
     }
-//    AuthResult res = await _auth.signInAnonymously();
   }
 
-  FocusNode emailFocus;
-  FocusNode passwordFocus;
   FocusNode mobileFocus;
   String adminMobile;
   List<String> deliveryMobiles;
 
   @override
   void initState() {
-    emailFocus = FocusNode();
-    passwordFocus = FocusNode();
     mobileFocus = FocusNode();
     _configDatabaseRef.child("users").orderByKey().equalTo("admin").onValue.listen((event) {
       adminMobile = event.snapshot.value["admin"].toString();
@@ -142,8 +137,6 @@ class _SigninPageState extends State<SigninPage> {
 
   @override
   void dispose() {
-    emailFocus.dispose();
-    passwordFocus.dispose();
     mobileFocus.dispose();
     super.dispose();
   }
@@ -175,10 +168,7 @@ class _SigninPageState extends State<SigninPage> {
                         children: <Widget>[
                           Text("Sign In", style: Theme.of(context).textTheme.headline1),
                           Padding(padding: EdgeInsets.only(top: 10)),
-//                          EmailInputField(_saveUserName,emailFocus,passwordFocus),
                           MobileNumberInputField(_savePhoneNumber, mobileFocus, null),
-//                          Padding(padding: EdgeInsets.only(top: 10)),
-//                          PasswordInputField(_savePassword,passwordFocus,emailFocus),
                           Padding(padding: EdgeInsets.only(top: 10)),
                           SigninButton(_key,_sendToNextScreen)
                         ],
@@ -200,16 +190,7 @@ class _SigninPageState extends State<SigninPage> {
       signin();
     }
   }
-
-  _saveUserName(user){
-    this.username = user;
-  }
-
   _savePhoneNumber(num){
     this.mobile = num;
-  }
-
-  _savePassword(pass){
-    this.password = pass;
   }
 }

@@ -16,25 +16,17 @@ class CreateCustomerAccountPage extends StatefulWidget {
 class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   GlobalKey<FormState> _key = GlobalKey();
 
-  FirebaseAuth _auth;
-
-  String username, password;
-
   FirebaseUser user;
 
   DatabaseReference _databaseReference;
-  DatabaseReference _deliveryDatabaseReference;
 
   DatabaseReference _idDataReference;
 
   String _name = "";
-  String _registeredOn = "";
   String _mobileNumber = "";
-  String _address = "";
-
+  String _registeredOn="";
   FocusNode nameFocusNode;
   FocusNode mobileFocusNode;
-  FocusNode addressFocusNode;
 
   showError(String error){
     showDialog(
@@ -68,17 +60,13 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   @override
   void initState() {
     super.initState();
-    _auth = FirebaseAuth.instance;
     _databaseReference = FirebaseDatabase.instance.reference().child("customer");
     _idDataReference = FirebaseDatabase.instance.reference().child("config");
-    _deliveryDatabaseReference = FirebaseDatabase.instance.reference().child("deliveryperson");
     deliveryPersons = {};
     deliverypersonNames = List();
     getDeliveryPersons();
     nameFocusNode = FocusNode();
     mobileFocusNode = FocusNode();
-    addressFocusNode = FocusNode();
-//    this.checkAuthentication();
   }
 
   getDeliveryPersons() async{
@@ -124,7 +112,6 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   void dispose() {
     nameFocusNode.dispose();
     mobileFocusNode.dispose();
-    addressFocusNode.dispose();
     super.dispose();
   }
 
@@ -159,9 +146,7 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
                             children: <Widget>[
                               NameInputField(_saveName, nameFocusNode,mobileFocusNode),
                               Padding(padding: EdgeInsets.only(top: 10)),
-                              MobileNumberInputField(_saveMobile,mobileFocusNode,addressFocusNode),
-//                              Padding(padding: EdgeInsets.only(top: 10)),
-//                              AddressInputFiled(_saveAddress,addressFocusNode,null),
+                              MobileNumberInputField(_saveMobile,mobileFocusNode,null),
                               Padding(padding: EdgeInsets.only(top: 10)),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,

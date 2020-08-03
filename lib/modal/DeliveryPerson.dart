@@ -5,7 +5,6 @@ class DeliveryPerson{
   String _id;
   String _deliveryPersonId;
   String _name;
-
   String _registeredOn;
   String _mobileNumber;
 
@@ -50,26 +49,17 @@ class DeliveryPerson{
     this._id = snapshot.key;
     this._name = snapshot.value['name'];
     this._deliveryPersonId = snapshot.value['deliveryPersonId'];
-//    this._dateOfBirth = snapshot.value['dataOfBirth'];
     this._registeredOn = snapshot.value['registeredOn'];
     this._mobileNumber = snapshot.value['mobile'];
-//    this._address = snapshot.value['address'];
-//    this._email = snapshot.value['email'];
-//    this._createdBy = snapshot.value['createdBy'];
   }
 
   Map<String,dynamic> toJson(){
     return {
       "name" : _name,
-    "deliveryPersonId":_deliveryPersonId,
-
+      "deliveryPersonId":_deliveryPersonId,
       "registeredOn" : _registeredOn,
-//      "dataOfBirth" : _dateOfBirth,
       "mobile" : _mobileNumber,
-//      "address" : _address,
-//      "email" : _email,
       "userType" : "deliveryPerson",
-//      "createdBy" : _createdBy,
     };
   }
 
