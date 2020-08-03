@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:account_manager/modal/Bill.dart';
 import 'package:account_manager/modal/Customer.dart';
 import 'package:account_manager/views/components/MobileNumberInputField.dart';
@@ -6,6 +8,7 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:sms/sms.dart';
 //import 'package:flutter_sms/flutter_sms.dart';
@@ -37,19 +40,42 @@ class _NewBillPageState extends State<NewBillPage> {
   List<String> liters;
   String selected;
   SmsSender sender;
+  String apiKey;
 //  String mobile = "+918760603355";
   _NewBillPageState(this.customer,this.price,this.isAdmin);
 
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child("bill");
   DatabaseReference _customerDatabaseRef = FirebaseDatabase.instance.reference().child("customer");
+  DatabaseReference _configDatabaseRef = FirebaseDatabase.instance.reference().child("config");
 
   GlobalKey<FormState> _key = GlobalKey();
 
+
+  Future<Map<String,dynamic>> sendMessage(content,numbers) async {
+    String url = "https://api.textlocal.in/send/?sender=TXTLCL";
+    url = url + "&message="+Uri.encodeComponent(content);
+    url = url + "&numbers="+numbers;
+    url = url + "&apiKey="+apiKey;
+    url = url + "&unicode="+"true";
+    url = url + "&test=true";
+    final response =  await http.get(url);
+    if (response.statusCode == 200) {
+      Map<String,dynamic> m = json.decode(response.body);
+      print(m);
+      return m;
+    } else {
+      throw Exception('Failed to load post');
+    }
+  }
 
   @override
   void initState() {
 
     sender = new SmsSender();
+    _configDatabaseRef.child("smsapikey").onValue.listen((event) {
+      print("API KEY"+event.snapshot.value);
+      apiKey = event.snapshot.value;
+    });
  total = 0;
  billIdKeyString = customer.customerId+"_"+DateTime.now().year.toString()+"-"+DateTime.now().month.toString();
  print(price);
@@ -274,11 +300,20 @@ class _NewBillPageState extends State<NewBillPage> {
     String date = DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
     String month = DateFormat('yyyy-MM').format(DateTime.now()).toString();
     Bill bill = Bill(customer.customerId, customer.name, double.parse(selected), price[selected] , date);
-    String text = "Milk bill\nExisting:₹"+ oldTotal.toString()+"\nNew:₹"+price[selected].toString()+".\nTotal: ₹"+ (oldTotal+price[selected]).toString();
+    String text = "Milk bill on "+date+"\nExisting:₹"+ oldTotal.toString()+"\nNew:₹"+price[selected].toString()+"\nTotal: ₹"+ (oldTotal+price[selected]).toString();
+    print(Uri.encodeComponent(text));
+    print(text.length);
+    print(text);
     await _databaseReference.push().set(bill.toJson()).whenComplete(()async => {
-      sender.sendSms(new SmsMessage(customer.mobileNumber, text)),
+//      sender.sendSms(new SmsMessage(customer.mobileNumber, text)),
+      sendMessage(text,"91"+customer.mobileNumber).then((value) => {
+        if(value["status"]=="success")
+          showSuccess("Message sent: "+text)
+        else
+            showError("Bill added but message not sent\n\""+value["errors"][0]["message"]+"\"")
+      }),
 //      await sendSMS(message: text, recipients: ["+918760603355"]),
-      showSuccess(text),
+//      showSuccess(text),
       _key.currentState.reset(),
     }).catchError((err)=>{
       showError(err.message)
@@ -305,10 +340,21 @@ class _NewBillPageState extends State<NewBillPage> {
     double total1 = total;
     String month = DateFormat('yyyy-MM').format(DateTime.now()).toString();
     String text = "Total milk bill for the month "+month+" is ₹ "+total1.toString();
-    sender.sendSms(new SmsMessage(customer.mobileNumber, text)).then((message) => {
-      showSuccess("Monthly bill sent, Message: "+text),
+    sendMessage(text,"91"+customer.mobileNumber).then((value) => {
+      if(value["status"]=="success")
+        showSuccess("Monthly bill sent, Message: "+text)
+      else
+        {
+          print(value),
+          showError(value["errors"][0]["message"])
+        }
     }).catchError((e)=>{
       showError(e.message),
     });
+//    sender.sendSms(new SmsMessage(customer.mobileNumber, text)).then((message) => {
+//      showSuccess("Monthly bill sent, Message: "+text),
+//    }).catchError((e)=>{
+//      showError(e.message),
+//    });
   }
 }
