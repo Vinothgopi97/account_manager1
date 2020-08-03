@@ -114,6 +114,9 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
     final String username = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white, //change your color here
+        ),
         title: Text("Milk Bill Manager", style: Theme.of(context).appBarTheme.textTheme.headline1,),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.lock,color: Colors.white,), onPressed: logout),

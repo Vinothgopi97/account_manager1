@@ -36,8 +36,7 @@ class _SigninPageState extends State<SigninPage> {
         print("DELIVERY PERSON");
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-              builder: (context) =>
-                  DeliveryPersonHome(deliveryMobiles.indexOf(user.phoneNumber).toString())
+              builder: (context) => DeliveryPersonHome(deliveryMobiles.indexOf(user.phoneNumber).toString())
           ),
         );
       }
@@ -92,14 +91,10 @@ class _SigninPageState extends State<SigninPage> {
                              FlatButton(onPressed: () async {
                                final code = _codeController.text.trim();
                                AuthCredential credential = PhoneAuthProvider.getCredential(verificationId: verificationid, smsCode: code);
-
+                               Navigator.of(context).pop();
                                AuthResult res = await _auth.signInWithCredential(credential).catchError((e)=>{
                                  showError(e.message)
                                });
-                               if(res.user != null)
-                               {
-                                 Navigator.of(context).pop();
-                               }
                              }, child: Text("Signin"))
                            ],
                          ),
@@ -157,12 +152,15 @@ class _SigninPageState extends State<SigninPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        color: Theme.of(context).backgroundColor,
         alignment: Alignment.center,
         child: Center(
           child: Container(
+            height: 500,
             padding: EdgeInsets.symmetric(vertical: 50),
-            color: Theme.of(context).backgroundColor,
+
             child: Card(
+
               margin: Theme.of(context).cardTheme.margin,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),

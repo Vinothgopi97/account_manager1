@@ -65,13 +65,6 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     );
   }
 
-  checkAuthentication() async {
-    _auth.onAuthStateChanged.listen((user) async {
-      if(user != null){
-        Navigator.of(context).pushReplacementNamed("/home");
-      }
-    });
-  }
 
   @override
   void initState() {
@@ -82,15 +75,8 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     mobileNode = FocusNode();
     nameNode = FocusNode();
     addressNode = FocusNode();
-//    this.checkAuthentication();
     super.initState();
   }
-
-
-//  signUp() async{
-//   AuthResult res = await _auth.createUserWithEmailAndPassword(email: username, password: password);
-//  }
-//
 
   saveDeliveryPerson() async{
     if( _name.isNotEmpty  && _mobileNumber.isNotEmpty ){
@@ -160,8 +146,9 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
                     Form(
                         key: _key,
                         child:Container(
-                          height: MediaQuery.of(context).size.height,
+                          height: 400,
                           child:  ListView(
+                            padding: EdgeInsets.symmetric(vertical: 50,horizontal: 10),
                             children: <Widget>[
                               NameInputField(_saveName,nameNode,mobileNode),
                               Padding(padding: EdgeInsets.only(top: 10)),
@@ -194,33 +181,17 @@ class _CreateDeliveryPersonAccountPageState extends State<CreateDeliveryPersonAc
     if(_key.currentState.validate())
     {
       _key.currentState.save();
-//      signUp();
       saveDeliveryPerson();
     }
   }
 
-  _saveUserName(user){
-    this.username = user;
-    this._email = user;
-  }
 
   _saveName(name){
     this._name = name;
-  }
-
-  _saveAddress(address){
-    this._address = address;
   }
 
   _saveMobile(mobile){
     this._mobileNumber = mobile;
   }
 
-  _saveDateOfBirth(dob){
-    this._dateOfBirth = dob;
-  }
-
-  _savePassword(pass){
-    this.password = pass;
-  }
 }

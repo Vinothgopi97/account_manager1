@@ -62,14 +62,6 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
     );
   }
 
-  checkAuthentication() async {
-    _auth.onAuthStateChanged.listen((user) async {
-      if(user != null){
-        Navigator.of(context).pushReplacementNamed("/home");
-      }
-    });
-  }
-
   Map<String,String> deliveryPersons={};
   List<String> deliverypersonNames;
   String selected = "";
@@ -103,15 +95,7 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
       for(int j=0;j< deliverypersonNames.length;j++){
         deliveryPersons.putIfAbsent(deliverypersonNames.elementAt(j), () => j.toString());
       }
-//      m.forEach((key, value) {
-//        deliveryPersons.putIfAbsent(value, () => key);
-//        setState(() {
-//          deliverypersonNames.add(value);
-//        });
-//        selected = deliverypersonNames.length >= 1 ? deliverypersonNames.elementAt(0) : "No Delivery Persons available";
-//      });
     });
-
   }
 
   saveCustomer() async{
@@ -200,7 +184,6 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
                                       });
                                     },
                                     value: selected,
-
                                   ),
                                 ],
                               ),
@@ -229,10 +212,6 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
 
   _saveName(name){
     this._name = name;
-  }
-
-  _saveAddress(address){
-    this._address = address;
   }
 
   _saveMobile(mobile){
