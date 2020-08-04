@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:sms/sms.dart';
+//import 'package:sms/sms.dart';
 //import 'package:flutter_sms/flutter_sms.dart';
 
 class NewBillPage extends StatefulWidget {
@@ -29,9 +29,6 @@ class NewBillPage extends StatefulWidget {
 
 class _NewBillPageState extends State<NewBillPage> {
 
-//  String customerId;
-//  String customerName;
-//  String mobile;
   Customer customer;
   Map<String,double> price;
 
@@ -39,9 +36,8 @@ class _NewBillPageState extends State<NewBillPage> {
 
   List<String> liters;
   String selected;
-  SmsSender sender;
+//  SmsSender sender;
   String apiKey;
-//  String mobile = "+918760603355";
   _NewBillPageState(this.customer,this.price,this.isAdmin);
 
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child("bill");
@@ -61,17 +57,16 @@ class _NewBillPageState extends State<NewBillPage> {
     final response =  await http.get(url);
     if (response.statusCode == 200) {
       Map<String,dynamic> m = json.decode(response.body);
-      print(m);
       return m;
     } else {
-      throw Exception('Failed to load post');
+      throw Exception('Failed to send sms');
     }
   }
 
   @override
   void initState() {
 
-    sender = new SmsSender();
+//    sender = new SmsSender();
     _configDatabaseRef.child("smsapikey").onValue.listen((event) {
       print("API KEY"+event.snapshot.value);
       apiKey = event.snapshot.value;
@@ -298,7 +293,6 @@ class _NewBillPageState extends State<NewBillPage> {
     double oldTotal = total;
     total = 0;
     String date = DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
-    String month = DateFormat('yyyy-MM').format(DateTime.now()).toString();
     Bill bill = Bill(customer.customerId, customer.name, double.parse(selected), price[selected] , date);
     String text = "Milk bill on "+date+"\nExisting:₹"+ oldTotal.toString()+"\nNew:₹"+price[selected].toString()+"\nTotal: ₹"+ (oldTotal+price[selected]).toString();
     print(Uri.encodeComponent(text));

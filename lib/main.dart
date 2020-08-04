@@ -2,7 +2,6 @@ import 'package:account_manager/views/CreateCustomerAccountPage.dart';
 import 'package:account_manager/views/CreateDeliveryPersonAccountPage.dart';
 import 'package:account_manager/views/HomePage.dart';
 import 'package:account_manager/views/SigninPage.dart';
-import 'package:account_manager/views/ViewDeliveryPersons.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -72,9 +71,7 @@ class MyApp extends StatelessWidget {
       routes: <String,WidgetBuilder> {
         "/signin": (builder) => SigninPage(),
         "/adminhome": (builder) => Home(),
-//        "/deliveryhome": (builder) => DeliveryPersonHome(),
         "/createdeliveryperson": (builder) => CreateDeliveryPersonAccountPage(),
-        "/viewdeliverypersons": (builder) => ViewDeliveryPersons(),
         "/createcustomer": (builder) => CreateCustomerAccountPage(),
       },
     );

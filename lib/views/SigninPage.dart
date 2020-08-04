@@ -27,8 +27,6 @@ class _SigninPageState extends State<SigninPage> {
   checkAuthentication() async {
     print("In check auth");
     _auth.onAuthStateChanged.listen((user) async {
-      print("User mobile "+user.phoneNumber);
-      print("Admin mobile"+adminMobile.toString());
       if(user != null && user.phoneNumber == adminMobile){
         Navigator.of(context).pushReplacementNamed("/adminhome");
       }
@@ -62,14 +60,14 @@ class _SigninPageState extends State<SigninPage> {
       _key.currentState.save();
       try{
 //        AuthResult result = await _auth.signInWithEmailAndPassword(email: username, password: password);
-      print(mobile);
+      print("Delivery mobiles has ${deliveryMobiles.contains("+91"+mobile)}");
          if("+91"+mobile == adminMobile || deliveryMobiles.contains("+91"+mobile)){
            await _auth.verifyPhoneNumber(
                phoneNumber: "+91"+mobile,
                timeout: Duration(seconds: 60),
                verificationCompleted: (AuthCredential credential) async {
                  Navigator.of(context).pop();
-                 AuthResult res = await _auth.signInWithCredential(credential);
+                 await _auth.signInWithCredential(credential);
                },
                verificationFailed: (AuthException e){
                  showError(e.message);
@@ -92,7 +90,7 @@ class _SigninPageState extends State<SigninPage> {
                                final code = _codeController.text.trim();
                                AuthCredential credential = PhoneAuthProvider.getCredential(verificationId: verificationid, smsCode: code);
                                Navigator.of(context).pop();
-                               AuthResult res = await _auth.signInWithCredential(credential).catchError((e)=>{
+                               await _auth.signInWithCredential(credential).catchError((e)=>{
                                  showError(e.message)
                                });
                              }, child: Text("Signin"))
@@ -127,9 +125,9 @@ class _SigninPageState extends State<SigninPage> {
     });
     _configDatabaseRef.child("users").child("deliveryperson").onValue.listen((event) {
       DataSnapshot snapshot = event.snapshot;
-      print("Delivery Person Mobiles");
       List<dynamic> list =  snapshot.value;
       deliveryMobiles = list.cast();
+      print("Delivery Person Mobiles ${deliveryMobiles}");
     });
     this.checkAuthentication();
     super.initState();
