@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 //import 'package:sms/sms.dart';
 //import 'package:flutter_sms/flutter_sms.dart';
 
-class NewBillPage extends StatefulWidget {
+class SendBillDialoug extends StatefulWidget {
 
   Customer customer;
 
@@ -21,13 +21,13 @@ class NewBillPage extends StatefulWidget {
 
   Map<String,double> priceList;
 
-  NewBillPage(this.customer,this.priceList,this.isAdmin);
+  SendBillDialoug(this.customer,this.priceList,this.isAdmin);
 
   @override
-  _NewBillPageState createState() => _NewBillPageState(this.customer,this.priceList,this.isAdmin);
+  _SendBillDialougState createState() => _SendBillDialougState(this.customer,this.priceList,this.isAdmin);
 }
 
-class _NewBillPageState extends State<NewBillPage> {
+class _SendBillDialougState extends State<SendBillDialoug> {
 
   Customer customer;
   Map<String,double> price;
@@ -38,13 +38,12 @@ class _NewBillPageState extends State<NewBillPage> {
   String selected;
 //  SmsSender sender;
   String apiKey;
-  _NewBillPageState(this.customer,this.price,this.isAdmin);
+  _SendBillDialougState(this.customer,this.price,this.isAdmin);
 
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference().child("bill");
   DatabaseReference _customerDatabaseRef = FirebaseDatabase.instance.reference().child("customer");
   DatabaseReference _configDatabaseRef = FirebaseDatabase.instance.reference().child("config");
-  
-  
+
   GlobalKey<FormState> _key = GlobalKey();
 
 
@@ -54,6 +53,7 @@ class _NewBillPageState extends State<NewBillPage> {
     url = url + "&numbers="+numbers;
     url = url + "&apiKey="+apiKey;
     url = url + "&unicode="+"true";
+    url = url + "&test=true";
     final response =  await http.get(url);
     if (response.statusCode == 200) {
       Map<String,dynamic> m = json.decode(response.body);
@@ -298,12 +298,7 @@ class _NewBillPageState extends State<NewBillPage> {
     print(Uri.encodeComponent(text));
     print(text.length);
     print(text);
-    DataSnapshot snapshot = await _configDatabaseRef.once();
-    int oldid = int.parse(snapshot.value["latestbillid"].toString());
-    int id = oldid +1;
-    Map<String,dynamic> idmap = {"latestbillid":id.toString()};
-    await _databaseReference.child(oldid.toString()).set(bill.toJson()).whenComplete(()async => {       
-      await _configDatabaseRef.update(idmap),
+    await _databaseReference.push().set(bill.toJson()).whenComplete(()async => {
 //      sender.sendSms(new SmsMessage(customer.mobileNumber, text)),
       sendMessage(text,"91"+customer.mobileNumber).then((value) => {
         if(value["status"]=="success")
