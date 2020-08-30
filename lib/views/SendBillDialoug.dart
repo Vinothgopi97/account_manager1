@@ -15,11 +15,9 @@ import 'package:intl/intl.dart';
 
 class SendBillDialoug extends StatefulWidget {
 
-  Customer customer;
-
-  bool isAdmin;
-
-  Map<String,double> priceList;
+  final Customer customer;
+  final bool isAdmin;
+  final Map<String,double> priceList;
 
   SendBillDialoug(this.customer,this.priceList,this.isAdmin);
 
@@ -86,7 +84,7 @@ class _SendBillDialougState extends State<SendBillDialoug> {
   getTotal() async{
     total = 0;
     double val = 0;
-    await _databaseReference.orderByChild("customerId").equalTo(customer.customerId).onValue.listen((event) {
+    _databaseReference.orderByChild("customerId").equalTo(customer.customerId).onValue.listen((event) {
 
 //      val = val + double.parse(event.snapshot.value["billamount"]);
     }).onDone(() {

@@ -1,50 +1,44 @@
-import 'dart:collection';
-
 import 'package:account_manager/modal/Customer.dart';
 import 'package:account_manager/modal/DeliveryPerson.dart';
 import 'package:account_manager/views/NewBillPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 
 class DeliveryPersonHome extends StatefulWidget {
-
-  String _deliveryPersonId;
-
+  final String _deliveryPersonId;
 
   DeliveryPersonHome(this._deliveryPersonId);
 
   @override
-  _DeliveryPersonHomeState createState() => _DeliveryPersonHomeState(this._deliveryPersonId);
+  _DeliveryPersonHomeState createState() =>
+      _DeliveryPersonHomeState(this._deliveryPersonId);
 }
 
 class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseUser user;
+  User user;
   bool isSignedin = false;
   String _deliveryPersonId;
   DeliveryPerson _deliveryPerson;
 
-
-  DatabaseReference _databaseReference;
+  // DatabaseReference _databaseReference;
 
   _DeliveryPersonHomeState(this._deliveryPersonId);
 
   checkAuthentication() async {
-    _auth.onAuthStateChanged.listen((user) async {
-      if(user == null){
+    _auth.authStateChanges().listen((user) async {
+      if (user == null) {
         Navigator.of(context).pushReplacementNamed("/signin");
       }
     });
   }
 
-  getUser() async{
-    FirebaseUser firebaseuser = await _auth.currentUser();
+  getUser() async {
+    User firebaseuser = _auth.currentUser;
     await firebaseuser?.reload();
-    firebaseuser = await _auth.currentUser();
-    if(firebaseuser != null){
+    firebaseuser = _auth.currentUser;
+    if (firebaseuser != null) {
       setState(() {
         this.user = firebaseuser;
         this.isSignedin = true;
@@ -52,43 +46,57 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
     }
   }
 
-  signout() async{
+  signout() async {
     _auth.signOut();
   }
 
-  gotoCreateDeliveryPersonPage(){
+  gotoCreateDeliveryPersonPage() {
     Navigator.pushNamed(context, "/createdeliveryperson");
   }
 
-  gotoCreateCustomerPage(){
+  gotoCreateCustomerPage() {
     Navigator.pushNamed(context, "/createcustomer");
   }
 
-  gotoViewCustomerPage(){
+  gotoViewCustomerPage() {
     Navigator.pushNamed(context, "/viewcustomers");
   }
-  Map<String,double> price = {};
+
+  Map<String, double> price = {};
 
   getPriceList() async {
-    LinkedHashMap priceList;
-    await _databaseReference.child("config").child("price").onValue.listen((event) {
-      priceList = event.snapshot.value;
-      priceList.forEach((key, value) {
-        String k = key.replaceAll('point', '.');
-        double val = double.parse(value.toString());
-        price.putIfAbsent(k, () => val);
-      });
-    });
+    Map<String, dynamic> priceList;
+//    _databaseReference.child("config").child("price").onValue.listen((event) {
+//      priceList = event.snapshot.value;
+//      priceList.forEach((key, value) {
+//        String k = key.replaceAll('point', '.');
+//        double val = double.parse(value.toString());
+//        price.putIfAbsent(k, () => val);
+//      });
+//    });
+    await FirebaseFirestore.instance
+        .collection("config")
+        .doc("price")
+        .get()
+        .then((value) => {
+              priceList = value.data(),
+              priceList.forEach((key, value) {
+                String k = key.replaceAll('point', '.');
+                double val = double.parse(value.toString());
+                price.putIfAbsent(k, () => val);
+              }),
+            });
   }
 
-  logout(){
+  logout() {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text("Are You Sure"),
         content: Text("Are you sure to signout."),
         actions: <Widget>[
-          FlatButton(onPressed: ()=> Navigator.of(context).pop(), child: Text("No")),
+          FlatButton(
+              onPressed: () => Navigator.of(context).pop(), child: Text("No")),
           FlatButton(onPressed: signout, child: Text("Yes"))
         ],
       ),
@@ -97,90 +105,188 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
 
   @override
   void initState() {
-
     isSignedin = false;
-    _databaseReference = FirebaseDatabase.instance.reference();
-    _databaseReference.child("deliveryperson").child(_deliveryPersonId).onValue.listen((event) {
-      _deliveryPerson = DeliveryPerson.fromSnapshot(event.snapshot);
-    });
+//    _databaseReference = FirebaseDatabase.instance.reference();
+//    _databaseReference
+//        .child("deliveryperson")
+//        .child(_deliveryPersonId)
+//        .onValue
+//        .listen((event) {
+//      _deliveryPerson = DeliveryPerson.fromSnapshot(event.snapshot);
+//    });
+    getDeliveryPerson();
     this.checkAuthentication();
     this.getPriceList();
-    this.getUser();
+//    this.getUser();
     super.initState();
+  }
+
+  getDeliveryPerson() async {
+    print(_deliveryPersonId);
+    await FirebaseFirestore.instance
+        .collection("deliverypersons")
+        .doc(_deliveryPersonId)
+        .get()
+        .then((value) => {
+              print(value.data()),
+              _deliveryPerson = DeliveryPerson.fromQuerySnapshot(value),
+            });
   }
 
   @override
   Widget build(BuildContext context) {
-    final String username = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
           color: Colors.white, //change your color here
         ),
-        title: Text("Milk Bill Manager", style: Theme.of(context).appBarTheme.textTheme.headline1,),
+        title: Text(
+          "Milk Bill Manager",
+          style: Theme.of(context).appBarTheme.textTheme.headline1,
+        ),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.lock,color: Colors.white,), onPressed: logout),
+          IconButton(
+              icon: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              onPressed: logout),
         ],
       ),
-      body: isSignedin? FirebaseAnimatedList(
-          shrinkWrap: true,
-          padding: EdgeInsets.symmetric(vertical: 5),
-          query: _databaseReference.child("customer").orderByChild("deliveryPersonId").equalTo(_deliveryPersonId),
-          defaultChild: Center(child: CircularProgressIndicator(),),
-          itemBuilder: (context,snapshot,animation,index){
-            Customer customer = Customer.fromSnapshot(snapshot);
-            return Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(10.0),
-                    top: Radius.circular(2.0)),
-              ),
-              margin: EdgeInsets.all(5),
-              child: ListTile(
-                dense: true,
-                title: Text(customer.name,style: TextStyle(fontSize: 20,letterSpacing: 0.9),),
-                subtitle: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(padding: EdgeInsets.only(top:5),child: Text(customer.mobileNumber),),
-                    Padding(padding: EdgeInsets.only(top:5),child: Text("Delivery person: "+customer.deliveryPersonName),),
+      body: isSignedin
+          ? Container(
+              height: 300,
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("customers")
+                      .where("deliveryPersonId", isEqualTo: _deliveryPersonId)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData)
+                      return Text("Loading...");
+                    else
+                      return ListView.builder(
+                          itemCount: snapshot.data.documents.length,
+                          itemBuilder: (context, index) {
+                            QueryDocumentSnapshot s =
+                                snapshot.data.documents[index];
+                            Customer customer =
+                                Customer.fromQueryDocumentSnapshot(
+                                    snapshot.data.documents[index]);
 
-                  ],
-                ),
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).backgroundColor,
-                  child: Text(customer.customerId, style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    IconButton(icon: Icon(Icons.add_circle),
-                        color: Theme.of(context).iconTheme.color,
-                        onPressed: ()=>{
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    NewBillPage(customer,price,false)
-                            ),
-                          )
-                        })
-                  ],
-                ),
-//                  onTap: ()=>{
-//                    Navigator.of(context).push(
-//                      MaterialPageRoute(
-//                          builder: (context) =>
-//                              ViewDeliveryPerson(deliveryPerson.id)
-//                      ),
-//                    )
-//                  },
-              ),
-            );
-          }
-      ) : Center(
-        child: CircularProgressIndicator(),
-      ),
+                            return ListTile(
+                              dense: true,
+                              title: Text(
+                                customer.name,
+                                style:
+                                    TextStyle(fontSize: 20, letterSpacing: 0.9),
+                              ),
+                              subtitle: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Text(customer.mobileNumber),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Text("Delivery person: " +
+                                        customer.deliveryPersonName),
+                                  ),
+                                ],
+                              ),
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    Theme.of(context).backgroundColor,
+                                child: Text(
+                                  customer.customerId,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  IconButton(
+                                      icon: Icon(Icons.add_circle),
+                                      color: Theme.of(context).iconTheme.color,
+                                      onPressed: () => {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      NewBillPage(customer,
+                                                          price, false)),
+                                            )
+                                          })
+                                ],
+                              ),
+                            );
+                          });
+                  }),
+            )
+//      FirebaseAnimatedList(
+//          shrinkWrap: true,
+//          padding: EdgeInsets.symmetric(vertical: 5),
+//          query: _databaseReference.child("customer").orderByChild("deliveryPersonId").equalTo(_deliveryPersonId),
+//          defaultChild: Center(child: CircularProgressIndicator(),),
+//          itemBuilder: (context,snapshot,animation,index){
+//            Customer customer = Customer.fromSnapshot(snapshot);
+//            return Card(
+//              shape: RoundedRectangleBorder(
+//                borderRadius: BorderRadius.vertical(
+//                    bottom: Radius.circular(10.0),
+//                    top: Radius.circular(2.0)),
+//              ),
+//              margin: EdgeInsets.all(5),
+//              child: ListTile(
+//                dense: true,
+//                title: Text(customer.name,style: TextStyle(fontSize: 20,letterSpacing: 0.9),),
+//                subtitle: Column(
+//                  mainAxisAlignment: MainAxisAlignment.start,
+//                  crossAxisAlignment: CrossAxisAlignment.start,
+//                  children: <Widget>[
+//                    Padding(padding: EdgeInsets.only(top:5),child: Text(customer.mobileNumber),),
+//                    Padding(padding: EdgeInsets.only(top:5),child: Text("Delivery person: "+customer.deliveryPersonName),),
+//
+//                  ],
+//                ),
+//                leading: CircleAvatar(
+//                  backgroundColor: Theme.of(context).backgroundColor,
+//                  child: Text(customer.customerId, style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),),
+//                ),
+//                trailing: Row(
+//                  mainAxisSize: MainAxisSize.min,
+//                  children: <Widget>[
+//                    IconButton(icon: Icon(Icons.add_circle),
+//                        color: Theme.of(context).iconTheme.color,
+//                        onPressed: ()=>{
+//                          Navigator.of(context).push(
+//                            MaterialPageRoute(
+//                                builder: (context) =>
+//                                    NewBillPage(customer,price,false)
+//                            ),
+//                          )
+//                        })
+//                  ],
+//                ),
+////                  onTap: ()=>{
+////                    Navigator.of(context).push(
+////                      MaterialPageRoute(
+////                          builder: (context) =>
+////                              ViewDeliveryPerson(deliveryPerson.id)
+////                      ),
+////                    )
+////                  },
+//              ),
+//            );
+//          }
+//      )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 
 class SigninButton extends StatelessWidget {
-  GlobalKey<FormState> _key;
-  Function _fun;
 
-  SigninButton(GlobalKey key, Function fun){
-    _key = key;
-    _fun = fun;
-  }
+  final Function _fun;
+
+  SigninButton(this._fun);
 
   @override
   Widget build(BuildContext context) {
