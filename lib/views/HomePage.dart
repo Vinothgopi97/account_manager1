@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
         while (Navigator.canPop(context)) {
           Navigator.of(context).pop();
         }
-        Navigator.of(context).pushNamed("/signin");
+        Navigator.of(context).pushReplacementNamed("/signin");
       }
     });
   }
