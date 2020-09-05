@@ -4,7 +4,6 @@ import 'package:account_manager/views/components/NameInputField.dart';
 import 'package:account_manager/views/components/SignupButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -18,9 +17,6 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   GlobalKey<FormState> _key = GlobalKey();
 
   User user;
-
-  // DatabaseReference _databaseReference;
-  // DatabaseReference _idDataReference;
 
   String _name = "";
   String _mobileNumber = "";
@@ -62,9 +58,7 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   @override
   void initState() {
     super.initState();
-    // _databaseReference =
-    //     FirebaseDatabase.instance.reference().child("customer");
-    // _idDataReference = FirebaseDatabase.instance.reference().child("config");
+
     deliveryPersons = {};
     deliverypersonNames = List();
     getDeliveryPersons();
@@ -73,26 +67,25 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
   }
 
   getDeliveryPersons() async {
-    FirebaseDatabase.instance
-        .reference()
-        .child("config")
-        .child("deliverypersons")
-        .onValue
-        .listen((event) {
-      DataSnapshot snapshot = event.snapshot;
-//      LinkedHashMap<dynamic,dynamic> m = snapshot.value;
-      print(snapshot.value);
-      List<dynamic> m = snapshot.value;
+    List<String> names = List();
+    deliveryPersons.clear();
+    deliverypersonNames.clear();
+    FirebaseFirestore.instance
+        .collection("deliverypersons")
+        .snapshots()
+        .forEach((element) {
+      element.docs.forEach((el) {
+        String name = el.get("name");
+        String id = el.id;
+        deliveryPersons.putIfAbsent(name, () => id);
+        names.add(name);
+      });
       setState(() {
-        deliverypersonNames = m.cast();
+        deliverypersonNames = names;
         selected = deliverypersonNames.length >= 1
             ? deliverypersonNames.elementAt(0)
             : "No Delivery Persons available";
       });
-      for (int j = 0; j < deliverypersonNames.length; j++) {
-        deliveryPersons.putIfAbsent(
-            deliverypersonNames.elementAt(j), () => j.toString());
-      }
     });
   }
 
@@ -102,14 +95,7 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
       user = FirebaseAuth.instance.currentUser;
 
       int id = 0;
-      // DataSnapshot snapshot = await _idDataReference.once();
-      // int id = int.parse(snapshot.value["latestcustomerid"].toString());
       String deliveryPersonId = deliveryPersons[selected].toString();
-      // String old = id.toString();
-
-      // id = id + 1;
-      // Map<String, dynamic> idmap = {"latestcustomerid": id};
-
       await FirebaseFirestore.instance
           .collection("config")
           .doc("customer")
@@ -130,15 +116,6 @@ class _CreateCustomerAccountPageState extends State<CreateCustomerAccountPage> {
                 _key.currentState.reset()
               })
           .catchError((err) => {showError(err.message)});
-//      await _databaseReference
-//          .child(old)
-//          .set(customer.toJson())
-//          .whenComplete(() async => {
-//                await _idDataReference.update(idmap),
-//                showSuccess("Customer Added"),
-//                _key.currentState.reset()
-//              })
-//          .catchError((err) => {showError(err.message)});
     }
   }
 

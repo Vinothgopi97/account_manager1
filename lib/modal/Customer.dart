@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 class Customer {
   String _id;
@@ -60,15 +59,15 @@ class Customer {
     _mobileNumber = value;
   }
 
-  Customer.fromSnapshot(DataSnapshot snapshot) {
-    this._id = snapshot.key;
-    this._name = snapshot.value['name'];
-    this._customerRegisterdOn = snapshot.value['registeredOn'];
-    this._mobileNumber = snapshot.value['mobile'];
-    this._customerId = snapshot.value['customerId'];
-    this._deliveryPersonId = snapshot.value['deliveryPersonId'];
-    this._deliveryPersonName = snapshot.value["deliveryPersonName"];
-  }
+  // Customer.fromSnapshot(DataSnapshot snapshot) {
+  //   this._id = snapshot.key;
+  //   this._name = snapshot.value['name'];
+  //   this._customerRegisterdOn = snapshot.value['registeredOn'];
+  //   this._mobileNumber = snapshot.value['mobile'];
+  //   this._customerId = snapshot.value['customerId'];
+  //   this._deliveryPersonId = snapshot.value['deliveryPersonId'];
+  //   this._deliveryPersonName = snapshot.value["deliveryPersonName"];
+  // }
 
   Customer.fromQueryDocumentSnapshot(QueryDocumentSnapshot snapshot) {
     this._id = snapshot.id;

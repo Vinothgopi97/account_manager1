@@ -71,13 +71,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.3"
-  date_field:
-    dependency: "direct main"
-    description:
-      name: date_field
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
   fake_async:
     dependency: transitive
     description:
@@ -134,13 +127,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.0"
-  firebase_database:
-    dependency: "direct main"
-    description:
-      name: firebase_database
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.0"
   flutter:
     dependency: "direct main"
     description: flutter

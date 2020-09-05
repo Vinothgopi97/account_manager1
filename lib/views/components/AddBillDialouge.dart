@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class AddBillDialouge extends StatefulWidget {
-  Customer _customer;
-  Map<String, double> _priceList;
+  final Customer _customer;
+  final Map<String, double> _priceList;
 
   AddBillDialouge(this._customer, this._priceList);
 
@@ -62,6 +62,11 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
               }),
             });
     return total;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

@@ -41,9 +41,9 @@ class _SigninPageState extends State<SigninPage> {
       try {
         print(
             "Delivery mobiles has ${deliveryMobiles.contains("+91" + mobile)}");
-        print(deliveryMobiles);
-        print(mobile);
-        print(adminMobile);
+        // print(deliveryMobiles);
+        // print(mobile);
+        // print(adminMobile);
         if ("+91" + mobile == adminMobile ||
             deliveryMobiles.contains("+91" + mobile)) {
           await _auth.verifyPhoneNumber(
@@ -80,8 +80,8 @@ class _SigninPageState extends State<SigninPage> {
                                   Navigator.of(context).pop();
                                   await _auth
                                       .signInWithCredential(credential)
-                                      .catchError((FirebaseAuthException e) =>
-                                          {showError(e.message)});
+                                      .catchError(
+                                          (e) => showError(e.toString()));
                                 },
                                 child: Text("Signin"))
                           ],
@@ -119,11 +119,14 @@ class _SigninPageState extends State<SigninPage> {
     _auth.authStateChanges().listen((user) async {
       await getDeliveryPersonMobiles();
       if (user != null && user.phoneNumber == adminMobile) {
+        while (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
         Navigator.of(context).pushReplacementNamed("/adminhome");
       } else if (user != null && deliveryMobiles.contains(user.phoneNumber)) {
-        print("DELIVERY PERSON");
-        // print(user.phoneNumber);
-        // print(deliveryMobiles.indexOf(user.phoneNumber).toString());
+        while (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
               builder: (context) => DeliveryPersonHome(

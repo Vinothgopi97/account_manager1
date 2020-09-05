@@ -1,6 +1,7 @@
 import 'package:account_manager/modal/Customer.dart';
 import 'package:account_manager/modal/DeliveryPerson.dart';
 import 'package:account_manager/views/NewBillPage.dart';
+import 'package:account_manager/views/components/AddBillDialouge.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,12 +27,30 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
 
   _DeliveryPersonHomeState(this._deliveryPersonId);
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   checkAuthentication() async {
     _auth.authStateChanges().listen((user) async {
       if (user == null) {
-        Navigator.of(context).pushReplacementNamed("/signin");
+        while (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+        Navigator.of(context).pushNamed("/signin");
       }
     });
+  }
+
+  showAddBillDialouge(Customer customer) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text("Add Bill"),
+        content: AddBillDialouge(customer, price),
+      ),
+    );
   }
 
   getUser() async {
@@ -66,14 +85,6 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
 
   getPriceList() async {
     Map<String, dynamic> priceList;
-//    _databaseReference.child("config").child("price").onValue.listen((event) {
-//      priceList = event.snapshot.value;
-//      priceList.forEach((key, value) {
-//        String k = key.replaceAll('point', '.');
-//        double val = double.parse(value.toString());
-//        price.putIfAbsent(k, () => val);
-//      });
-//    });
     await FirebaseFirestore.instance
         .collection("config")
         .doc("price")
@@ -106,18 +117,10 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
   @override
   void initState() {
     isSignedin = false;
-//    _databaseReference = FirebaseDatabase.instance.reference();
-//    _databaseReference
-//        .child("deliveryperson")
-//        .child(_deliveryPersonId)
-//        .onValue
-//        .listen((event) {
-//      _deliveryPerson = DeliveryPerson.fromSnapshot(event.snapshot);
-//    });
     getDeliveryPerson();
     this.checkAuthentication();
     this.getPriceList();
-//    this.getUser();
+    this.getUser();
     super.initState();
   }
 
@@ -153,7 +156,7 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
               onPressed: logout),
         ],
       ),
-      body: isSignedin
+      body: user != null
           ? Container(
               height: 300,
               child: StreamBuilder(
@@ -168,122 +171,74 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
                       return ListView.builder(
                           itemCount: snapshot.data.documents.length,
                           itemBuilder: (context, index) {
-                            QueryDocumentSnapshot s =
-                                snapshot.data.documents[index];
                             Customer customer =
                                 Customer.fromQueryDocumentSnapshot(
                                     snapshot.data.documents[index]);
 
-                            return ListTile(
-                              dense: true,
-                              title: Text(
-                                customer.name,
-                                style:
-                                    TextStyle(fontSize: 20, letterSpacing: 0.9),
-                              ),
-                              subtitle: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 5),
-                                    child: Text(customer.mobileNumber),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 5),
-                                    child: Text("Delivery person: " +
-                                        customer.deliveryPersonName),
-                                  ),
-                                ],
-                              ),
-                              leading: CircleAvatar(
-                                backgroundColor:
-                                    Theme.of(context).backgroundColor,
-                                child: Text(
-                                  customer.customerId,
+                            return Card(
+                              child: ListTile(
+                                dense: true,
+                                title: Text(
+                                  customer.name,
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
+                                      fontSize: 20, letterSpacing: 0.9),
                                 ),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  IconButton(
-                                      icon: Icon(Icons.add_circle),
-                                      color: Theme.of(context).iconTheme.color,
-                                      onPressed: () => {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      NewBillPage(customer,
-                                                          price, false)),
-                                            )
-                                          })
-                                ],
+                                subtitle: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(customer.mobileNumber),
+                                    ),
+                                    // Padding(
+                                    //   padding: EdgeInsets.only(top: 5),
+                                    //   child: Text("Delivery person: " +
+                                    //       customer.deliveryPersonName),
+                                    // ),
+                                  ],
+                                ),
+                                leading: CircleAvatar(
+                                  backgroundColor:
+                                      Theme.of(context).backgroundColor,
+                                  child: Text(
+                                    customer.customerId,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.message,
+                                          color:
+                                              Theme.of(context).iconTheme.color,
+                                        ),
+                                        onPressed: () =>
+                                            {showAddBillDialouge(customer)}),
+                                    IconButton(
+                                        icon: Icon(Icons.add_circle),
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                        onPressed: () => {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        NewBillPage(customer,
+                                                            price, false)),
+                                              )
+                                            })
+                                  ],
+                                ),
                               ),
                             );
                           });
                   }),
             )
-//      FirebaseAnimatedList(
-//          shrinkWrap: true,
-//          padding: EdgeInsets.symmetric(vertical: 5),
-//          query: _databaseReference.child("customer").orderByChild("deliveryPersonId").equalTo(_deliveryPersonId),
-//          defaultChild: Center(child: CircularProgressIndicator(),),
-//          itemBuilder: (context,snapshot,animation,index){
-//            Customer customer = Customer.fromSnapshot(snapshot);
-//            return Card(
-//              shape: RoundedRectangleBorder(
-//                borderRadius: BorderRadius.vertical(
-//                    bottom: Radius.circular(10.0),
-//                    top: Radius.circular(2.0)),
-//              ),
-//              margin: EdgeInsets.all(5),
-//              child: ListTile(
-//                dense: true,
-//                title: Text(customer.name,style: TextStyle(fontSize: 20,letterSpacing: 0.9),),
-//                subtitle: Column(
-//                  mainAxisAlignment: MainAxisAlignment.start,
-//                  crossAxisAlignment: CrossAxisAlignment.start,
-//                  children: <Widget>[
-//                    Padding(padding: EdgeInsets.only(top:5),child: Text(customer.mobileNumber),),
-//                    Padding(padding: EdgeInsets.only(top:5),child: Text("Delivery person: "+customer.deliveryPersonName),),
-//
-//                  ],
-//                ),
-//                leading: CircleAvatar(
-//                  backgroundColor: Theme.of(context).backgroundColor,
-//                  child: Text(customer.customerId, style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),),
-//                ),
-//                trailing: Row(
-//                  mainAxisSize: MainAxisSize.min,
-//                  children: <Widget>[
-//                    IconButton(icon: Icon(Icons.add_circle),
-//                        color: Theme.of(context).iconTheme.color,
-//                        onPressed: ()=>{
-//                          Navigator.of(context).push(
-//                            MaterialPageRoute(
-//                                builder: (context) =>
-//                                    NewBillPage(customer,price,false)
-//                            ),
-//                          )
-//                        })
-//                  ],
-//                ),
-////                  onTap: ()=>{
-////                    Navigator.of(context).push(
-////                      MaterialPageRoute(
-////                          builder: (context) =>
-////                              ViewDeliveryPerson(deliveryPerson.id)
-////                      ),
-////                    )
-////                  },
-//              ),
-//            );
-//          }
-//      )
           : Center(
               child: CircularProgressIndicator(),
             ),

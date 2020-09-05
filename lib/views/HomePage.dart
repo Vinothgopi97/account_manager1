@@ -16,9 +16,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User user;
-
-  // DatabaseReference _deliveryDatabaseReference;
-  // DatabaseReference _configDatabaseReference;
   bool isSignedin = false;
   Map<String, double> price = {};
   List<String> liters;
@@ -28,7 +25,10 @@ class _HomeState extends State<Home> {
   checkAuthentication() async {
     _auth.authStateChanges().listen((user) async {
       if (user == null) {
-        Navigator.of(context).pushReplacementNamed("/signin");
+        while (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+        Navigator.of(context).pushNamed("/signin");
       }
     });
   }
@@ -77,24 +77,22 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void initState() {
     price = {};
     isSignedin = false;
     this.checkAuthentication();
     this.getUser();
     messageApi = MessageApi();
-    // _configDatabaseReference =
-    //     FirebaseDatabase.instance.reference().child("config");
-    // _deliveryDatabaseReference =
-    //     FirebaseDatabase.instance.reference().child("deliveryperson");
     getPriceList();
-
     super.initState();
   }
 
   getPriceList() async {
-    // LinkedHashMap priceList;
-
     FirebaseFirestore.instance
         .collection("config")
         .doc("price")
@@ -110,20 +108,10 @@ class _HomeState extends State<Home> {
         selected = liters.elementAt(0);
       });
     });
-
-    // _configDatabaseReference.child("price").onValue.listen((event) {
-    //   priceList = event.snapshot.value;
-    //   priceList.forEach((key, value) {
-    //     String k = key.replaceAll('point', '.');
-    //     double val = double.parse(value.toString());
-    //     price.putIfAbsent(k, () => val);
-    //   });
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    final String username = ModalRoute.of(context).settings.arguments;
     return DefaultTabController(
         length: 2,
         child: Scaffold(
@@ -175,8 +163,6 @@ class _HomeState extends State<Home> {
                           return ListView.builder(
                               itemCount: snapshot.data.documents.length,
                               itemBuilder: (context, index) {
-                                QueryDocumentSnapshot s =
-                                    snapshot.data.documents[index];
                                 Customer customer =
                                     Customer.fromQueryDocumentSnapshot(
                                         snapshot.data.documents[index]);
@@ -201,7 +187,12 @@ class _HomeState extends State<Home> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         IconButton(
-                                            icon: Icon(Icons.event),
+                                            icon: Icon(
+                                              Icons.message,
+                                              color: Theme.of(context)
+                                                  .iconTheme
+                                                  .color,
+                                            ),
                                             onPressed: () => {
                                                   showAddBillDialouge(customer)
                                                 }),
@@ -252,8 +243,6 @@ class _HomeState extends State<Home> {
                           return ListView.builder(
                               itemCount: snapshot.data.documents.length,
                               itemBuilder: (context, index) {
-                                QueryDocumentSnapshot s =
-                                    snapshot.data.documents[index];
                                 DeliveryPerson deliveryperson =
                                     DeliveryPerson.fromQuerySnapshot(
                                         snapshot.data.documents[index]);
@@ -292,85 +281,6 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-//             Scaffold(
-//               body: isSignedin
-//                   ? FirebaseAnimatedList(
-//                       shrinkWrap: true,
-//                       padding: EdgeInsets.symmetric(vertical: 5),
-//                       query: _deliveryDatabaseReference.orderByKey(),
-//                       defaultChild: Center(
-//                         child: CircularProgressIndicator(),
-//                       ),
-//                       itemBuilder: (context, snapshot, animation, index) {
-//                         DeliveryPerson deliveryPerson =
-//                             DeliveryPerson.fromSnapshot(snapshot);
-//                         return Card(
-//                           shape: RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.vertical(
-//                                 bottom: Radius.circular(10.0),
-//                                 top: Radius.circular(2.0)),
-//                           ),
-//                           margin: EdgeInsets.all(5),
-//                           child: ListTile(
-//                             dense: true,
-//                             title: Text(
-//                               deliveryPerson.name,
-//                               style:
-//                                   TextStyle(fontSize: 20, letterSpacing: 0.9),
-//                             ),
-//                             subtitle: Text(deliveryPerson.mobileNumber),
-//                             leading: CircleAvatar(
-//                               backgroundColor:
-//                                   Theme.of(context).backgroundColor,
-//                               child: Text(
-//                                 deliveryPerson.deliveryPersonId,
-//                                 style: TextStyle(
-//                                     color: Colors.white,
-//                                     fontSize: 20,
-//                                     fontWeight: FontWeight.bold),
-//                               ),
-//                             ),
-// //                    trailing: Row(
-// //                      mainAxisSize: MainAxisSize.min,
-// //                      children: <Widget>[
-// //                        IconButton(icon: Icon(Icons.add),
-// //                            color: Theme.of(context).iconTheme.color,
-// //                            onPressed: ()=>{
-// //                              Navigator.of(context).push(
-// //                                MaterialPageRoute(
-// //                                    builder: (context) =>
-// //                                        NewBillPage(customer,price)
-// //                                ),
-// //                              )
-// //                            })
-// //                      ],
-// //                    ),
-// //                  onTap: ()=>{
-// //                    Navigator.of(context).push(
-// //                      MaterialPageRoute(
-// //                          builder: (context) =>
-// //                              ViewDeliveryPerson(deliveryPerson.id)
-// //                      ),
-// //                    )
-// //                  },
-//                           ),
-//                         );
-//                       })
-//                   : Center(
-//                       child: CircularProgressIndicator(),
-//                     ),
-//               floatingActionButton: FloatingActionButton.extended(
-//                 onPressed: gotoCreateDeliveryPersonPage,
-//                 icon: Icon(
-//                   Icons.add,
-//                   color: Colors.white,
-//                 ),
-//                 label: Text(
-//                   "Delivery Person",
-//                   style: TextStyle(color: Colors.white),
-//                 ),
-//               ),
-//             ),
           ]),
         ));
   }
@@ -384,22 +294,4 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
-  // String billIdKeyString;
-  //
-  // Future<double> getTotalBill(String billIdKeyString1) async {
-  //   double total = 0.0;
-  //   List<QueryDocumentSnapshot> list;
-  //   await FirebaseFirestore.instance
-  //       .collection("bills")
-  //       .where("billId", isEqualTo: billIdKeyString1)
-  //       .get()
-  //       .then((value) => {
-  //             list = value.docs,
-  //             list.forEach((element) {
-  //               total += element.get("billamount");
-  //             }),
-  //           });
-  //   return total;
-  // }
 }

@@ -23,10 +23,11 @@ class MessageApi {
     url = url + "&numbers=" + numbers;
     url = url + "&apiKey=" + apiKey;
     url = url + "&unicode=" + "true";
-    url = url + "&test=" + "true";
+    // url = url + "&test=" + "true";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       Map<String, dynamic> m = json.decode(response.body);
+      print(m);
       return m;
     } else {
       throw Exception('Failed to send sms');

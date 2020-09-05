@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_database/firebase_database.dart';
 
 class Bill {
   String _id;
@@ -30,16 +30,16 @@ class Bill {
     this._billId = snapshot.get("billId");
   }
 
-  Bill.fromSnapshot(DataSnapshot snapshot) {
-    this._id = snapshot.key;
-    this._customerId = snapshot.value['customerId'];
-    this._customerName = snapshot.value['customerName'];
-    this._litersDelivered =
-        double.parse(snapshot.value['litersDelivered'].toString());
-    this._price = double.parse(snapshot.value['billamount'].toString());
-    this._billDate = snapshot.value['billDate'];
-    this._billId = snapshot.value["billId"];
-  }
+  // Bill.fromSnapshot(DataSnapshot snapshot) {
+  //   this._id = snapshot.key;
+  //   this._customerId = snapshot.value['customerId'];
+  //   this._customerName = snapshot.value['customerName'];
+  //   this._litersDelivered =
+  //       double.parse(snapshot.value['litersDelivered'].toString());
+  //   this._price = double.parse(snapshot.value['billamount'].toString());
+  //   this._billDate = snapshot.value['billDate'];
+  //   this._billId = snapshot.value["billId"];
+  // }
 
   Map<String, dynamic> toJson() {
     return {

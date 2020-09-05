@@ -51,8 +51,12 @@ class _NewBillPageState extends State<NewBillPage> {
         DateTime.now().year.toString() +
         "-" +
         DateTime.now().month.toString();
-    getTotalBill(billIdKeyString);
-
+    // getTotalBill(billIdKeyString);
+    getTotalBill(billIdKeyString).then((value) => {
+          setState(() {
+            total = value;
+          })
+        });
     liters = price.keys.toList();
     selected = liters.elementAt(0);
     super.initState();
@@ -60,38 +64,38 @@ class _NewBillPageState extends State<NewBillPage> {
 
   String billIdKeyString;
 
-  getTotalBill(String billIdKeyString1) async {
-    FirebaseFirestore.instance
+  // getTotalBill(String billIdKeyString1) async {
+  //   await FirebaseFirestore.instance
+  //       .collection("bills")
+  //       .where("billId", isEqualTo: billIdKeyString1)
+  //       .snapshots()
+  //       .listen((event) {
+  //     double temp = 0.0;
+  //     event.docs.forEach((element) {
+  //       temp += element.get("billamount");
+  //     });
+  //
+  //     setState(() {
+  //       total = temp;
+  //     });
+  //   });
+  // }
+
+  Future<double> getTotalBill(String billIdKeyString1) async {
+    double total = 0.0;
+    List<QueryDocumentSnapshot> list;
+    await FirebaseFirestore.instance
         .collection("bills")
         .where("billId", isEqualTo: billIdKeyString1)
-        .snapshots()
-        .listen((event) {
-      double temp = 0.0;
-      event.docs.forEach((element) {
-        temp += element.get("billamount");
-      });
-
-      setState(() {
-        total = temp;
-      });
-    });
+        .get()
+        .then((value) => {
+              list = value.docs,
+              list.forEach((element) {
+                total += element.get("billamount");
+              }),
+            });
+    return total;
   }
-
-//   getTotal() async {
-//     total = 0;
-//     double val = 0;
-//     _databaseReference
-//         .orderByChild("customerId")
-//         .equalTo(customer.customerId)
-//         .onValue
-//         .listen((event) {
-// //      val = val + double.parse(event.snapshot.value["billamount"]);
-//     }).onDone(() {
-//       setState(() {
-//         total = val;
-//       });
-//     });
-//   }
 
   var mobile;
   mobileSave(num) {
@@ -117,14 +121,6 @@ class _NewBillPageState extends State<NewBillPage> {
                   Navigator.of(context).pop(),
                   showSuccess("Mobile Number updated successfully"),
                 });
-
-        // await _customerDatabaseRef
-        //     .child(customer.id)
-        //     .update(customer.toJson())
-        //     .then((value) => {
-        //           Navigator.of(context).pop(),
-        //           showSuccess("Mobile Number updated successfully"),
-        //         });
       }
     }
   }
@@ -274,8 +270,6 @@ class _NewBillPageState extends State<NewBillPage> {
                             return ListView.builder(
                                 itemCount: snapshot.data.documents.length,
                                 itemBuilder: (context, index) {
-                                  QueryDocumentSnapshot s =
-                                      snapshot.data.documents[index];
                                   Bill bill = Bill.fromQueryDocumentSnapshot(
                                       snapshot.data.documents[index]);
 
@@ -350,7 +344,9 @@ class _NewBillPageState extends State<NewBillPage> {
         price[selected].toString() +
         "\nTotal: ₹" +
         (oldTotal + price[selected]).toString();
-
+    setState(() {
+      total = oldTotal + price[selected];
+    });
     await FirebaseFirestore.instance
         .collection("config")
         .doc("bill")
@@ -395,6 +391,14 @@ class _NewBillPageState extends State<NewBillPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    customer = null;
+    price = null;
+    total = null;
+    super.dispose();
   }
 
   _sendMMonthlyBill() {
