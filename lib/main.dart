@@ -4,6 +4,7 @@ import 'package:account_manager/views/HomePage.dart';
 import 'package:account_manager/views/SigninPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:permissions_plugin/permissions_plugin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,9 +13,24 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  Future<void> checkAndGrantPermissions(BuildContext context) async {
+    Map<Permission, PermissionState> permission =
+        await PermissionsPlugin.checkPermissions([Permission.SEND_SMS]);
+    if (permission[Permission.SEND_SMS] != PermissionState.GRANTED) {
+      try {
+        permission =
+            await PermissionsPlugin.requestPermissions([Permission.SEND_SMS]);
+      } on Exception {
+        debugPrint("Error");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    checkAndGrantPermissions(context);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Account Manager',
       theme: ThemeData(
         appBarTheme: AppBarTheme(

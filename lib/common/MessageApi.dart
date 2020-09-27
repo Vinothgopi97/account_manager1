@@ -27,7 +27,6 @@ class MessageApi {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       Map<String, dynamic> m = json.decode(response.body);
-      print(m);
       return m;
     } else {
       throw Exception('Failed to send sms');

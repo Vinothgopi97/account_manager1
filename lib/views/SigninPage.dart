@@ -62,7 +62,10 @@ class _SigninPageState extends State<SigninPage> {
                     barrierDismissible: false,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text("Enter the code"),
+                        title: Align(
+                          alignment: Alignment.center,
+                          child: Text("Enter the code sent"),
+                        ),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
@@ -83,7 +86,11 @@ class _SigninPageState extends State<SigninPage> {
                                       .catchError(
                                           (e) => showError(e.toString()));
                                 },
-                                child: Text("Signin"))
+                                color: Theme.of(context).accentColor,
+                                child: Text(
+                                  "Signin",
+                                  style: TextStyle(color: Colors.white),
+                                ))
                           ],
                         ),
                       );
@@ -178,8 +185,15 @@ class _SigninPageState extends State<SigninPage> {
                       key: _key,
                       child: Column(
                         children: <Widget>[
-                          Text("Sign In",
-                              style: Theme.of(context).textTheme.headline1),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text("Milk Account Manager",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 30,
+                                    color: Theme.of(context).primaryColor,
+                                    letterSpacing: 0.4)),
+                          ),
                           Padding(padding: EdgeInsets.only(top: 10)),
                           MobileNumberInputField(
                               _savePhoneNumber, mobileFocus, null),

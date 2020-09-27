@@ -47,8 +47,35 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text("Add Bill"),
+        title: Align(
+          alignment: Alignment.center,
+          child: Text("Add Bill"),
+        ),
         content: AddBillDialouge(customer, price),
+      ),
+    );
+  }
+
+  showUserData() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Align(
+          alignment: Alignment.center,
+          child: Text("User Info"),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Logged in as Delivery Person"),
+            Text("Name: " + _deliveryPerson.name),
+            Text("Mobile: " + _deliveryPerson.mobileNumber)
+          ],
+        ),
+        actions: <Widget>[
+          FlatButton(
+              onPressed: () => {Navigator.of(context).pop()}, child: Text("OK"))
+        ],
       ),
     );
   }
@@ -61,6 +88,15 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
       setState(() {
         this.user = firebaseuser;
         this.isSignedin = true;
+      });
+      String mobile = firebaseuser.phoneNumber.substring(3);
+      FirebaseFirestore.instance
+          .collection("deliverypersons")
+          .where("mobile", isEqualTo: mobile)
+          .snapshots()
+          .listen((event) {
+        _deliveryPerson =
+            DeliveryPerson.fromQueryDocumentSnapshot(event.docs.first);
       });
     }
   }
@@ -148,6 +184,12 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
           style: Theme.of(context).appBarTheme.textTheme.headline1,
         ),
         actions: <Widget>[
+          IconButton(
+              icon: Icon(
+                Icons.account_circle,
+                color: Colors.white,
+              ),
+              onPressed: showUserData),
           IconButton(
               icon: Icon(
                 Icons.lock,

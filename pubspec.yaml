@@ -33,10 +33,21 @@ dependencies:
 #  firebase_database: 4.0.0
 #  date_field: 0.3.0
   cloud_firestore: 0.14.0+2
+  background_sms: ^0.0.2
+  permissions_plugin: ^1.1.4
+#  sendsms: ^1.0.3
+#  telephony: ^0.0.2
 #  sms: ^0.2.0
-#  flutter_sms: ^2.0.1+2
+#  flutter_sms: 1.0.0
+  #  sms_plugin: ^0.2.5
 #  url_launcher: 5.5.0
 #  flutter_rounded_date_picker: 1.0.4
+#  sms_plugin:
+#    git:
+#      url: https://github.com/galeka99/flutter_sms.git
+  flutter_phone_direct_caller:
+    git:
+      url: https://github.com/yanisalfian/flutter-phone-direct-caller.git
 
 dev_dependencies:
   flutter_test:

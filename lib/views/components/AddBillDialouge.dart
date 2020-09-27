@@ -1,9 +1,11 @@
-import 'package:account_manager/common/MessageApi.dart';
 import 'package:account_manager/modal/Bill.dart';
 import 'package:account_manager/modal/Customer.dart';
+import 'package:background_sms/background_sms.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+// import 'package:sms/sms.dart';
+// import 'package:sms_plugin/sms.dart';
 
 class AddBillDialouge extends StatefulWidget {
   final Customer _customer;
@@ -21,16 +23,50 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
   Map<String, double> _priceList;
   String selected;
   String billIdKeyString;
-  MessageApi messageApi;
+  // MessageApi messageApi;
   double total;
   List<String> liters;
+  // SmsSender sender;
+  // final Telephony telephony = Telephony.instance;
+
   _AddBillDialougeState(this._customer, this._priceList);
+
+  void _sendSMS(String message, String recipent) async {
+    // List<String> nums = [recipent];
+    // String _result =
+    //     await FlutterSms.sendSMS(message: message, recipients: nums)
+    //         .catchError((onError) {
+    //   print(onError);
+    // });
+
+    SmsStatus result = await BackgroundSms.sendMessage(
+            phoneNumber: recipent, message: message, simSlot: 1)
+        .catchError((e) => {showError(e.toString())});
+    if (result == SmsStatus.sent) {
+      showSuccess("Message Sent: " + message);
+    } else {
+      print("Failed");
+    }
+
+    // SimCardsProvider provider = new SimCardsProvider();
+    // List<SimCard> card = await provider.getSimCards();
+    // SmsSender sender = new SmsSender();
+    // // sender.onSmsDelivered.listen((SmsMessage message) {
+    // //   print('${message.address} received your message.');
+    // // });
+    // SmsMessage message1 = new SmsMessage(recipent, message);
+    // sender
+    //     .sendSms(message1, simCard: card.elementAt(0))
+    //     .then((value) => {showSuccess("Message Sent: " + message)})
+    //     .catchError((e) => {showError(e.toString())});
+  }
 
   @override
   void initState() {
     selected = _priceList.keys.toList().elementAt(0);
     total = 0.0;
-    messageApi = MessageApi();
+    // messageApi = MessageApi();
+    // sender = new SmsSender();
     liters = _priceList.keys.toList();
     setState(() {
       selected = liters.elementAt(0);
@@ -73,13 +109,14 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Customer Name: " + _customer.name),
+        Text("Customer: " + _customer.name),
         // Text("Total Bill - ₹" + total.toString()),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("Lliters delivered"),
+            Text("Liters delivered"),
             DropdownButton<String>(
               items: liters.map<DropdownMenuItem<String>>((e) {
                 return DropdownMenuItem<String>(
@@ -103,15 +140,27 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
           ],
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Spacer(),
             FlatButton(
+                color: Theme.of(context).accentColor,
                 onPressed: () => {addBill(_customer, selected, total)},
-                child: Text("Add Bill")),
+                child: Text(
+                  "Add Bill",
+                  style: TextStyle(color: Colors.white),
+                )),
+            Spacer(),
             FlatButton(
+                color: Theme.of(context).accentColor,
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text("Cancel"))
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                )),
+            Spacer(),
           ],
-        )
+        ),
       ],
     );
   }
@@ -122,6 +171,8 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
     String date = DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
     Bill bill = Bill(customer.customerId, customer.name, double.parse(liters),
         _priceList[liters], date);
+    List<String> mobiles = new List<String>();
+    mobiles.add(customer.mobileNumber);
     String text = "Milk bill on " +
         date +
         "\nExisting:₹" +
@@ -145,16 +196,27 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
                   .collection("config")
                   .doc("bill")
                   .set({"nextId": oldid + 1}),
-              messageApi
-                  .sendMessage(text, "91" + customer.mobileNumber)
-                  .then((value) => {
-                        if (value["status"] == "success")
-                          showSuccess("Message sent: " + text)
-                        else
-                          showError("Bill added but message not sent\n\"" +
-                              value["errors"][0]["message"] +
-                              "\"")
-                      }),
+              // messageApi
+              //     .sendMessage(text, "91" + customer.mobileNumber)
+              //     .then((value) => {
+              //           if (value["status"] == "success")
+              //             showSuccess("Message sent: " + text)
+              //           else
+              //             showError("Bill added but message not sent\n\"" +
+              //                 value["errors"][0]["message"] +
+              //                 "\"")
+              //         }),
+
+              // sender
+              //     .sendSms(new SmsMessage(customer.mobileNumber, text))
+              //     .then((message) => {
+              //           showSuccess("Message sent: " + text),
+              //         })
+              //     .catchError((e) => {
+              //           showError(e.message),
+              //         }),
+
+              _sendSMS(text, customer.mobileNumber)
             })
         .catchError((err) => {showError(err.message)});
   }

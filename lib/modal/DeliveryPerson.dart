@@ -59,6 +59,13 @@ class DeliveryPerson {
     this._mobileNumber = snapshot.get('mobile');
   }
 
+  DeliveryPerson.fromQueryDocumentSnapshot(QueryDocumentSnapshot snapshot) {
+    this._id = snapshot.id;
+    this._name = snapshot.get('name');
+    this._deliveryPersonId = snapshot.get('deliveryPersonId');
+    this._registeredOn = snapshot.get('registeredOn');
+    this._mobileNumber = snapshot.get('mobile');
+  }
   Map<String, dynamic> toJson() {
     return {
       "name": _name,

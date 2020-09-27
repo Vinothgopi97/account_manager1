@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.2"
+  background_sms:
+    dependency: "direct main"
+    description:
+      name: background_sms
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -132,6 +139,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_phone_direct_caller:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: d910fe25dcf9219a6934f9c934139c56d52eff0c
+      url: "https://github.com/yanisalfian/flutter-phone-direct-caller.git"
+    source: git
+    version: "1.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -198,6 +214,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.9.0"
+  permissions_plugin:
+    dependency: "direct main"
+    description:
+      name: permissions_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.4"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -275,4 +298,4 @@ packages:
     version: "2.0.8"
 sdks:
   dart: ">=2.9.0-14.0.dev <3.0.0"
-  flutter: ">=1.12.13+hotfix.5 <2.0.0"
+  flutter: ">=1.20.0 <2.0.0"

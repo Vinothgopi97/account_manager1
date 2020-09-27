@@ -143,6 +143,12 @@ class _HomeState extends State<Home> {
             actions: <Widget>[
               IconButton(
                   icon: Icon(
+                    Icons.account_circle,
+                    color: Colors.white,
+                  ),
+                  onPressed: showUserData),
+              IconButton(
+                  icon: Icon(
                     Icons.lock,
                     color: Colors.white,
                   ),
@@ -289,8 +295,34 @@ class _HomeState extends State<Home> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text("Add Bill"),
+        title: Align(
+          alignment: Alignment.center,
+          child: Text("Add Bill"),
+        ),
         content: AddBillDialouge(customer, price),
+      ),
+    );
+  }
+
+  showUserData() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Align(
+          alignment: Alignment.center,
+          child: Text("User Info"),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Logged in as Admin"),
+            Text("Mobile: " + _auth.currentUser.phoneNumber)
+          ],
+        ),
+        actions: <Widget>[
+          FlatButton(
+              onPressed: () => {Navigator.of(context).pop()}, child: Text("OK"))
+        ],
       ),
     );
   }
