@@ -187,7 +187,7 @@ class _SigninPageState extends State<SigninPage> {
                         children: <Widget>[
                           Align(
                             alignment: Alignment.center,
-                            child: Text("Milk Account Manager",
+                            child: Text("Freez Milk",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 30,
@@ -195,8 +195,11 @@ class _SigninPageState extends State<SigninPage> {
                                     letterSpacing: 0.4)),
                           ),
                           Padding(padding: EdgeInsets.only(top: 10)),
-                          MobileNumberInputField(
-                              _savePhoneNumber, mobileFocus, null),
+                          Container(
+                            child: MobileNumberInputField(
+                                _savePhoneNumber, mobileFocus, null),
+                            padding: EdgeInsets.only(right: 50),
+                          ),
                           Padding(padding: EdgeInsets.only(top: 10)),
                           SigninButton(_sendToNextScreen)
                         ],

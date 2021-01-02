@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "222481618090",
-    "firebase_url": "https://accountmanager-eb5c4.firebaseio.com",
-    "project_id": "accountmanager-eb5c4",
-    "storage_bucket": "accountmanager-eb5c4.appspot.com"
+    "project_number": "779429569308",
+    "firebase_url": "https://milkbillmanager.firebaseio.com",
+    "project_id": "milkbillmanager",
+    "storage_bucket": "milkbillmanager.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:222481618090:android:d1783ee480a37a32086cd3",
+        "mobilesdk_app_id": "1:779429569308:android:a42181903ad3d0fbaa10d9",
         "android_client_info": {
-          "package_name": "vinothgopi.com.account_manager"
+          "package_name": "com.app.milk_bill_manager"
         }
       },
       "oauth_client": [
         {
-          "client_id": "222481618090-4o979a196q5i9lfqp5aq2p0mg0u400tq.apps.googleusercontent.com",
+          "client_id": "779429569308-g0jluoc7bt1s8jdph7s6t7c4tbq9e3qv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "vinothgopi.com.account_manager",
-            "certificate_hash": "4ea2f3eece827674a196379ba00af14c1fb43d7c"
+            "package_name": "com.app.milk_bill_manager",
+            "certificate_hash": "a1487932a2a9ee3f8acc283036ef6e086987ae59"
           }
         },
         {
-          "client_id": "222481618090-pqeo0prsui5tru4fcjb428lvf6nt2c5b.apps.googleusercontent.com",
+          "client_id": "779429569308-9k59vrro33vs88n58l2cql1ua46j970h.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAx4AYfd--J6hIT5Nw88GNCM-VL_WN1yys"
+          "current_key": "AIzaSyBR81k5zuXBbUsirAaS6GAh60WHEIHWGbA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "222481618090-pqeo0prsui5tru4fcjb428lvf6nt2c5b.apps.googleusercontent.com",
+              "client_id": "779429569308-9k59vrro33vs88n58l2cql1ua46j970h.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

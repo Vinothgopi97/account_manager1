@@ -137,7 +137,7 @@ class _HomeState extends State<Home> {
               color: Colors.white, //change your color here
             ),
             title: Text(
-              "Milk Bill Manager",
+              "Freez Milk",
               style: Theme.of(context).appBarTheme.textTheme.headline1,
             ),
             actions: <Widget>[
