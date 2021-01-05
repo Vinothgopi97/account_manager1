@@ -42,6 +42,7 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
     SmsStatus result = await BackgroundSms.sendMessage(
             phoneNumber: recipent, message: message, simSlot: 1)
         .catchError((e) => {showError(e.toString())});
+
     if (result == SmsStatus.sent) {
       showSuccess("Message Sent: " + message);
     } else {
@@ -173,14 +174,23 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
         _priceList[liters], date);
     List<String> mobiles = new List<String>();
     mobiles.add(customer.mobileNumber);
-    String text = "Milk bill on " +
+    String text = "Fresz Milk:Bill on " +
         date +
         "\nExisting:₹" +
         oldTotal.toString() +
         "\nNew:₹" +
         _priceList[liters].toString() +
-        "\nTotal: ₹" +
+        "\nTotal:₹" +
         (oldTotal + _priceList[liters]).toString();
+    // String text =
+    //     "\u00b87\u00ba9\u00bcd\u00bb1\u00bc8\u00baf\u0020\u00baa\u00bc1\u00ba4\u00bbf\u00baf\u0020\u00bb0\u00b9a\u00bc0\u00ba4\u00bc1\u003a " +
+    //         date;
+    // "\nபழையவை:₹" +
+    // oldTotal.toString() +
+    // "\nபுதியவை:₹" +
+    // _priceList[liters].toString() +
+    // "\nமொத்தம்:₹" +
+    // (oldTotal + _priceList[liters]).toString();
 
     await FirebaseFirestore.instance
         .collection("config")

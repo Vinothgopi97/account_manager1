@@ -452,13 +452,13 @@ class _NewBillPageState extends State<NewBillPage> {
         price[selected], date);
     List<String> mobiles = new List<String>();
     mobiles.add(customer.mobileNumber);
-    String text = "Milk bill on " +
+    String text = "Fresz Milk:Bill on " +
         date +
         "\nExisting:₹" +
         oldTotal.toString() +
         "\nNew:₹" +
         price[selected].toString() +
-        "\nTotal: ₹" +
+        "\nTotal:₹" +
         (oldTotal + price[selected]).toString();
     setState(() {
       total = oldTotal + price[selected];
@@ -530,8 +530,10 @@ class _NewBillPageState extends State<NewBillPage> {
   _sendMMonthlyBill() {
     double total1 = total;
     String month = DateFormat('yyyy-MM').format(DateTime.now()).toString();
-    String text =
-        "Total milk bill for the month " + month + " is ₹ " + total1.toString();
+    String text = "Fresz Milk: Total bill for the month " +
+        month +
+        " is ₹ " +
+        total1.toString();
     List<String> mobiles = new List<String>();
     mobiles.add(customer.mobileNumber);
     _sendSMS(text, customer.mobileNumber);
