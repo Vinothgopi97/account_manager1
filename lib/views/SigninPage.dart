@@ -187,7 +187,7 @@ class _SigninPageState extends State<SigninPage> {
                         children: <Widget>[
                           Align(
                             alignment: Alignment.center,
-                            child: Text("Freez Milk",
+                            child: Text("Fresz Milk",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 30,
