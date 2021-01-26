@@ -41,14 +41,45 @@ class _NewBillPageState extends State<NewBillPage> {
   GlobalKey<FormState> _key = GlobalKey();
   // final Telephony telephony = Telephony.instance;
   void _sendSMS(String message, String recipent) async {
-    SmsStatus result = await BackgroundSms.sendMessage(
-            phoneNumber: recipent, message: message, simSlot: 1)
-        .catchError((e) => {showError(e.toString())});
+    SmsStatus result =
+        await BackgroundSms.sendMessage(phoneNumber: recipent, message: message)
+            .catchError((e) => {showError(e.toString())});
     if (result == SmsStatus.sent) {
       showSuccess("Message Sent: " + message);
     } else {
       print("Failed");
     }
+    // bool result = await BackgroundSms.isSupportCustomSim;
+    // if (result) {
+    //   print("Supports Custom Sim Slot");
+    //   SmsStatus result = await BackgroundSms.sendMessage(
+    //           phoneNumber: recipent, message: message, simSlot: 1)
+    //       .catchError((e) => {showError(e.toString())});
+    //   if (result == SmsStatus.sent) {
+    //     showSuccess("Message Sent: " + message);
+    //   } else {
+    //     print("Failed");
+    //   }
+    // } else {
+    //   print("Not Support Custom Sim Slot");
+    //   SmsStatus result = await BackgroundSms.sendMessage(
+    //           phoneNumber: recipent, message: message)
+    //       .catchError((e) => {showError(e.toString())});
+    //   if (result == SmsStatus.sent) {
+    //     showSuccess("Message Sent: " + message);
+    //   } else {
+    //     print("Failed");
+    //   }
+    // }
+
+    // SmsStatus result = await BackgroundSms.sendMessage(
+    //         phoneNumber: recipent, message: message, simSlot: 1)
+    //     .catchError((e) => {showError(e.toString())});
+    // if (result == SmsStatus.sent) {
+    //   showSuccess("Message Sent: " + message);
+    // } else {
+    //   print("Failed");
+    // }
 
     // SimCardsProvider provider = new SimCardsProvider();
     // List<SimCard> card = await provider.getSimCards();
@@ -226,6 +257,43 @@ class _NewBillPageState extends State<NewBillPage> {
     );
   }
 
+  _deleteCustomer(Customer customer) {
+    FirebaseFirestore.instance
+        .collection("customers")
+        .doc(customer.id)
+        .update({"active": "D"})
+        .then((value) => {
+              Navigator.of(context).pop(),
+              Navigator.of(context).pop(),
+              showSuccess("Account deleted successfully"),
+            })
+        .catchError((e) => {
+              showError(e.toString()),
+            });
+  }
+
+  _deleteCustomerAlert(Customer customer) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+                contentPadding: EdgeInsets.all(5),
+                title: Align(
+                    alignment: Alignment.center, child: Text("Are you sure?")),
+                content: Container(
+                  padding: EdgeInsets.all(10),
+                  child:
+                      Text("Are you sure to delete customer " + customer.name),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text("Cancel")),
+                  FlatButton(
+                      onPressed: () => {_deleteCustomer(customer)},
+                      child: Text("Delete"))
+                ]));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,6 +321,10 @@ class _NewBillPageState extends State<NewBillPage> {
                   color: Colors.white,
                 ),
                 onPressed: _sendMMonthlyBill),
+            if (isAdmin)
+              IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () => {_deleteCustomerAlert(customer)}),
           ],
         ),
         body: SingleChildScrollView(
@@ -376,6 +448,7 @@ class _NewBillPageState extends State<NewBillPage> {
                         stream: FirebaseFirestore.instance
                             .collection("bills")
                             .where("billId", isEqualTo: billIdKeyString)
+                            .orderBy("billDate", descending: true)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData)

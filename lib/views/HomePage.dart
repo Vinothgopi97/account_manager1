@@ -161,6 +161,7 @@ class _HomeState extends State<Home> {
                   ? StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection("customers")
+                          .where("active", isEqualTo: "Y")
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData)

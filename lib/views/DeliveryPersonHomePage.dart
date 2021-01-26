@@ -205,6 +205,7 @@ class _DeliveryPersonHomeState extends State<DeliveryPersonHome> {
                   stream: FirebaseFirestore.instance
                       .collection("customers")
                       .where("deliveryPersonId", isEqualTo: _deliveryPersonId)
+                      .where("active", isEqualTo: "Y")
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData)

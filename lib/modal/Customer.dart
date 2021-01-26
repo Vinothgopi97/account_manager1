@@ -8,6 +8,13 @@ class Customer {
   Timestamp _customerRegisterdOn;
   String _deliveryPersonId;
   String _deliveryPersonName;
+  String _active;
+
+  String get active => _active;
+
+  set active(String value) {
+    _active = value;
+  }
 
   String get deliveryPersonName => _deliveryPersonName;
 
@@ -27,7 +34,9 @@ class Customer {
       this._mobileNumber,
       this._deliveryPersonId,
       this._deliveryPersonName,
-      this._customerRegisterdOn);
+      this._customerRegisterdOn) {
+    this._active = "Y";
+  }
 
   String get customerId => _customerId;
 
@@ -77,6 +86,7 @@ class Customer {
     this._customerId = snapshot.get('customerId');
     this._deliveryPersonId = snapshot.get('deliveryPersonId');
     this._deliveryPersonName = snapshot.get("deliveryPersonName");
+    this._active = snapshot.get("active");
   }
 
   Map<String, dynamic> toJson() {
@@ -87,7 +97,8 @@ class Customer {
       "userType": "customer",
       "customerId": _customerId,
       "deliveryPersonId": _deliveryPersonId,
-      "deliveryPersonName": _deliveryPersonName
+      "deliveryPersonName": _deliveryPersonName,
+      "active": _active
     };
   }
 }

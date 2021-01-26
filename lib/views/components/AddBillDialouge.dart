@@ -23,66 +23,46 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
   Map<String, double> _priceList;
   String selected;
   String billIdKeyString;
+
   // MessageApi messageApi;
   double total;
   List<String> liters;
+
   // SmsSender sender;
   // final Telephony telephony = Telephony.instance;
 
   _AddBillDialougeState(this._customer, this._priceList);
 
-  void _sendSMS(String message, String recipent) async {
-    // List<String> nums = [recipent];
-    // String _result =
-    //     await FlutterSms.sendSMS(message: message, recipients: nums)
-    //         .catchError((onError) {
-    //   print(onError);
-    // });
-
-    SmsStatus result = await BackgroundSms.sendMessage(
-            phoneNumber: recipent, message: message, simSlot: 1)
-        .catchError((e) => {showError(e.toString())});
-
-    if (result == SmsStatus.sent) {
-      showSuccess("Message Sent: " + message);
-    } else {
-      print("Failed");
-    }
-
-    // SimCardsProvider provider = new SimCardsProvider();
-    // List<SimCard> card = await provider.getSimCards();
-    // SmsSender sender = new SmsSender();
-    // // sender.onSmsDelivered.listen((SmsMessage message) {
-    // //   print('${message.address} received your message.');
-    // // });
-    // SmsMessage message1 = new SmsMessage(recipent, message);
-    // sender
-    //     .sendSms(message1, simCard: card.elementAt(0))
-    //     .then((value) => {showSuccess("Message Sent: " + message)})
-    //     .catchError((e) => {showError(e.toString())});
+  showError(String error) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text("Error"),
+        content: Text(error),
+        actions: <Widget>[
+          FlatButton(
+              onPressed: () =>
+                  {Navigator.of(context).pop(), Navigator.of(context).pop()},
+              child: Text("OK"))
+        ],
+      ),
+    );
   }
 
-  @override
-  void initState() {
-    selected = _priceList.keys.toList().elementAt(0);
-    total = 0.0;
-    // messageApi = MessageApi();
-    // sender = new SmsSender();
-    liters = _priceList.keys.toList();
-    setState(() {
-      selected = liters.elementAt(0);
-    });
-    billIdKeyString = _customer.customerId +
-        "_" +
-        DateTime.now().year.toString() +
-        "-" +
-        DateTime.now().month.toString();
-    getTotalBill(billIdKeyString).then((value) => {
-          setState(() {
-            total = value;
-          })
-        });
-    super.initState();
+  showSuccess(String text) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text("Success"),
+        content: Text(text),
+        actions: <Widget>[
+          FlatButton(
+              onPressed: () =>
+                  {Navigator.of(context).pop(), Navigator.of(context).pop()},
+              child: Text("OK"))
+        ],
+      ),
+    );
   }
 
   Future<double> getTotalBill(String billIdKeyString1) async {
@@ -99,71 +79,6 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
               }),
             });
     return total;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text("Customer: " + _customer.name),
-        // Text("Total Bill - ₹" + total.toString()),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Liters delivered"),
-            DropdownButton<String>(
-              items: liters.map<DropdownMenuItem<String>>((e) {
-                return DropdownMenuItem<String>(
-                    value: e.toString(),
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(e.toString()),
-                      ],
-                    ));
-              }).toList(),
-              onChanged: (e) {
-                setState(() {
-                  selected = e.toString();
-                });
-              },
-              value: selected,
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Spacer(),
-            FlatButton(
-                color: Theme.of(context).accentColor,
-                onPressed: () => {addBill(_customer, selected, total)},
-                child: Text(
-                  "Add Bill",
-                  style: TextStyle(color: Colors.white),
-                )),
-            Spacer(),
-            FlatButton(
-                color: Theme.of(context).accentColor,
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  "Cancel",
-                  style: TextStyle(color: Colors.white),
-                )),
-            Spacer(),
-          ],
-        ),
-      ],
-    );
   }
 
   addBill(Customer customer, String liters, double total) async {
@@ -231,35 +146,145 @@ class _AddBillDialougeState extends State<AddBillDialouge> {
         .catchError((err) => {showError(err.message)});
   }
 
-  showError(String error) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text("Error"),
-        content: Text(error),
-        actions: <Widget>[
-          FlatButton(
-              onPressed: () =>
-                  {Navigator.of(context).pop(), Navigator.of(context).pop()},
-              child: Text("OK"))
-        ],
-      ),
-    );
+  void _sendSMS(String message, String recipent) async {
+    SmsStatus result =
+        await BackgroundSms.sendMessage(phoneNumber: recipent, message: message)
+            .catchError((e) => {showError(e.toString())});
+    if (result == SmsStatus.sent) {
+      showSuccess("Message Sent: " + message);
+    } else {
+      print("Failed");
+    }
+    // bool result = await BackgroundSms.isSupportCustomSim;
+    // if (result) {
+    //   print("Supports Custom Sim Slot");
+    //   SmsStatus result = await BackgroundSms.sendMessage(
+    //           phoneNumber: recipent, message: message)
+    //       .catchError((e) => {showError(e.toString())});
+    //   if (result == SmsStatus.sent) {
+    //     showSuccess("Message Sent: " + message);
+    //   } else {
+    //     print("Failed");
+    //   }
+    // } else {
+    //   print("Not Support Custom Sim Slot");
+    //   SmsStatus result = await BackgroundSms.sendMessage(
+    //           phoneNumber: recipent, message: message)
+    //       .catchError((e) => {showError(e.toString())});
+    //   if (result == SmsStatus.sent) {
+    //     showSuccess("Message Sent: " + message);
+    //   } else {
+    //     print("Failed");
+    //   }
+
+    // SmsStatus result = await BackgroundSms.sendMessage(
+    //         phoneNumber: recipent, message: message, simSlot: 1)
+    //     .catchError((e) => {showError(e.toString())});
+    //
+    // if (result == SmsStatus.sent) {
+    //   showSuccess("Message Sent: " + message);
+    // } else {
+    //   print("Failed");
+    // }
+
+    // SimCardsProvider provider = new SimCardsProvider();
+    // List<SimCard> card = await provider.getSimCards();
+    // SmsSender sender = new SmsSender();
+    // // sender.onSmsDelivered.listen((SmsMessage message) {
+    // //   print('${message.address} received your message.');
+    // // });
+    // SmsMessage message1 = new SmsMessage(recipent, message);
+    // sender
+    //     .sendSms(message1, simCard: card.elementAt(0))
+    //     .then((value) => {showSuccess("Message Sent: " + message)})
+    //     .catchError((e) => {showError(e.toString())});
   }
 
-  showSuccess(String text) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text("Success"),
-        content: Text(text),
-        actions: <Widget>[
-          FlatButton(
-              onPressed: () =>
-                  {Navigator.of(context).pop(), Navigator.of(context).pop()},
-              child: Text("OK"))
-        ],
-      ),
+  @override
+  void initState() {
+    selected = _priceList.keys.toList().elementAt(0);
+    total = 0.0;
+    // messageApi = MessageApi();
+    // sender = new SmsSender();
+    liters = _priceList.keys.toList();
+    setState(() {
+      selected = liters.elementAt(0);
+    });
+    billIdKeyString = _customer.customerId +
+        "_" +
+        DateTime.now().year.toString() +
+        "-" +
+        DateTime.now().month.toString();
+    getTotalBill(billIdKeyString).then((value) => {
+          setState(() {
+            total = value;
+          })
+        });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("Customer: " + _customer.name),
+        // Text("Total Bill - ₹" + total.toString()),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text("Liters delivered"),
+            DropdownButton<String>(
+              items: liters.map<DropdownMenuItem<String>>((e) {
+                return DropdownMenuItem<String>(
+                    value: e.toString(),
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(e.toString()),
+                      ],
+                    ));
+              }).toList(),
+              onChanged: (e) {
+                setState(() {
+                  selected = e.toString();
+                });
+              },
+              value: selected,
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            FlatButton(
+                color: Theme.of(context).accentColor,
+                onPressed: () => {addBill(_customer, selected, total)},
+                child: Text(
+                  "Add Bill",
+                  style: TextStyle(color: Colors.white),
+                )),
+            Spacer(),
+            FlatButton(
+                color: Theme.of(context).accentColor,
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                )),
+            Spacer(),
+          ],
+        ),
+      ],
     );
   }
 }
